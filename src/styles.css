@@ -1,1 +1,49 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap');
+
+:root {
+  --primary-color: #6a1b9a; /* Purple nebula */
+  --accent-color: #00b0ff; /* Blue glow */
+  --bg-gradient: linear-gradient(135deg, #0d001a, #1a0033, #330066);
+  --text-color: #e0e0e0;
+  --holo-shadow: 0 0 15px rgba(0, 176, 255, 0.5);
+  --orbit-animation: orbit 10s linear infinite;
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  font-family: 'Orbitron', sans-serif;
+}
+
+button {
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 50px;
+  box-shadow: var(--holo-shadow);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(0, 176, 255, 0.8);
+}
+
+@keyframes orbit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+  button { padding: 8px 16px; }
+}

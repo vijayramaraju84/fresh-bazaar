@@ -1,0 +1,124 @@
+.main-features {
+  padding: 20px;
+}
+
+.slider-container {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto 40px;
+  overflow: hidden;
+  border-radius: 15px;
+  box-shadow: var(--holo-shadow);
+}
+
+.slider {
+  position: relative;
+  height: 300px;
+}
+
+.slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+}
+
+.slide-image {
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px 0 0 15px;
+}
+
+.slide-content {
+  padding: 20px;
+  text-align: center;
+  flex: 1;
+}
+
+.offer {
+  color: var(--accent-color);
+  font-weight: bold;
+  font-size: 1.2em;
+  text-shadow: 0 0 10px var(--accent-color);
+}
+
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--text-color);
+}
+
+.prev { left: 10px; }
+.next { right: 10px; }
+
+.categories-section {
+  margin-bottom: 40px;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.category-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--text-color);
+  box-shadow: var(--holo-shadow);
+  transition: transform 0.3s;
+}
+
+.category-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 176, 255, 0.8);
+}
+
+.category-card img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--holo-shadow);
+  transition: transform 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 0 30px rgba(0, 176, 255, 0.9);
+}
+
+.product-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .slider { height: 250px; }
+  .slide-image { width: 100%; border-radius: 15px; }
+  .slide-content { position: absolute; bottom: 20px; width: 100%; background: rgba(0, 0, 0, 0.5); }
+  .categories-grid { grid-template-columns: 1fr; }
+  .products-grid { grid-template-columns: 1fr; }
+}

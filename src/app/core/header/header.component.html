@@ -1,0 +1,35 @@
+<mat-toolbar class="header">
+  <span class="logo">Fresh Bazaar</span>
+
+  <!-- Search Box -->
+  <div class="search">
+    <input
+      matInput
+      [(ngModel)]="searchQuery"
+      placeholder="Search products..."
+      class="search-input"
+      (keyup.enter)="search()"
+    />
+    <button mat-icon-button class="search-btn" (click)="search()" matTooltip="Search">
+      <mat-icon>search</mat-icon>
+    </button>
+  </div>
+
+  <div class="user-menu">
+    <button mat-icon-button *ngIf="!user" routerLink="/login" matTooltip="Login" class="icon-btn">
+      <mat-icon>person</mat-icon>
+    </button>
+
+    <button mat-icon-button *ngIf="user" (click)="logout()" matTooltip="Logout" class="icon-btn">
+      <mat-icon>logout</mat-icon>
+    </button>
+
+    <button mat-icon-button routerLink="/cart" matTooltip="Cart" class="icon-btn">
+      <mat-icon>shopping_cart</mat-icon>
+    </button>
+
+    <button mat-icon-button routerLink="/categories" matTooltip="Categories" class="icon-btn">
+      <mat-icon>category</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>

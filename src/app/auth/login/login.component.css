@@ -1,0 +1,126 @@
+/* Full screen container */
+.login-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  /* background: linear-gradient(135deg, #1a1a1a, #333); */
+  font-family: 'Arial', sans-serif;
+}
+
+/* Nebula background */
+.nebula-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.3;
+}
+
+/* Form */
+.login-form {
+  position: relative;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 40px 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  text-align: center;
+  color: #fff;
+}
+
+/* Heading */
+.login-form h2 {
+  margin-bottom: 25px;
+  font-family: 'Orbitron', sans-serif;
+  color: var(--accent-color, #ff9800);
+  letter-spacing: 1px;
+}
+
+/* Inputs */
+.login-form input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 16px;
+}
+
+.login-form input::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+/* Buttons */
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background: var(--accent-color, #ff9800);
+  color: #000;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.primary-btn:hover {
+  background: #ffc107;
+  transform: scale(1.05);
+}
+
+/* Skip button */
+.skip-btn {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s;
+}
+
+.skip-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Error message */
+.error {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+/* Toggle link */
+.toggle-link {
+  margin-top: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--accent-color, #ff9800);
+  transition: color 0.2s;
+}
+
+.toggle-link:hover {
+  color: #ffc107;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-form {
+    padding: 30px 20px;
+  }
+}

@@ -1,0 +1,18 @@
+.footer {
+  background: var(--primary-color);
+  text-align: center;
+  padding: 20px;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+.links a {
+  color: var(--text-color);
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .links { display: flex; flex-direction: column; }
+}

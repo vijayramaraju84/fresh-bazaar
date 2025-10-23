@@ -1,0 +1,49 @@
+<div class="login-container">
+  <!-- Video background -->
+  <video autoplay muted loop class="nebula-bg">
+    <source src="nebula.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- Login form -->
+  <form class="login-form">
+    <h2>{{ isSignup ? 'Sign Up' : 'Login' }}</h2>
+
+    <input
+      *ngIf="isSignup"
+      type="text"
+      [(ngModel)]="name"
+      placeholder="Name"
+      required
+      [ngModelOptions]="{standalone: true}"
+    />
+
+    <input
+      type="email"
+      [(ngModel)]="email"
+      placeholder="Email"
+      required
+      [ngModelOptions]="{standalone: true}"
+    />
+
+    <input
+      type="password"
+      [(ngModel)]="password"
+      placeholder="Password"
+      required
+      [ngModelOptions]="{standalone: true}"
+    />
+
+    <button type="button" (click)="submit()" class="primary-btn">
+      {{ isSignup ? 'Create Account' : 'Login' }}
+    </button>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+
+    <a class="toggle-link" (click)="toggleMode()">
+      {{ isSignup ? 'Already have an account? Login' : 'New user? Sign Up' }}
+    </a>
+
+    <button class="skip-btn" (click)="skip()">Skip for Now</button>
+  </form>
+</div>

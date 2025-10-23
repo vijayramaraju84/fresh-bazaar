@@ -1,0 +1,52 @@
+<div class="main-features">
+  <!-- Offers Slider -->
+  <div class="slider-container">
+    <button mat-icon-button class="nav-btn prev" (click)="prevSlide()" aria-label="Previous slide">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <div class="slider">
+      <div *ngFor="let product of featuredProducts; let i = index"
+           class="slide"
+           [@slideAnimation]="currentSlideIndex === i ? 'active' : 'inactive'"
+           [ngStyle]="{'display': currentSlideIndex === i ? 'block' : 'none'}">
+        <img [src]="product.image" alt="{{ product.name }}" class="slide-image">
+        <div class="slide-content">
+          <h3>{{ product.name }}</h3>
+          <p class="offer">{{ product.offer }}</p>
+          <p>${{ product.price }}</p>
+          <button mat-raised-button (click)="addToCart(product)">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button class="nav-btn next" (click)="nextSlide()" aria-label="Next slide">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+
+  <!-- Categories Section -->
+  <div class="categories-section">
+    <h2>Explore Categories</h2>
+    <div class="categories-grid">
+      <a *ngFor="let category of categories"
+         [routerLink]="['/categories']"
+         [queryParams]="{ category: category.name }"
+         routerLinkActive="active-category"
+         ariaCurrentWhenActive="page"
+         class="category-card"
+         @cardAnimation>
+        <img [src]="category.image" alt="{{ category.name }}">
+        <h3>{{ category.name }}</h3>
+      </a>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="products-grid">
+    <div *ngFor="let product of filteredProducts" class="product-card" @cardAnimation>
+      <img [src]="product.image" alt="{{ product.name }}">
+      <h3>{{ product.name }}</h3>
+      <p>${{ product.price }}</p>
+      <button mat-raised-button (click)="addToCart(product)">Add to Cart</button>
+    </div>
+  </div>
+</div>
