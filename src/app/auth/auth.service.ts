@@ -1,55 +1,54 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 
 export interface User {
-  email: string;
-  password: string; // In real app, hash this
-  name?: string;
+  id?: number;
+  username: string;
+  role?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private users: User[] = [];
-  private currentUser = new BehaviorSubject<User | null>(null);
+  private baseUrl = 'https://auth-service-rpa2.onrender.com/auth';
 
-  constructor() {
-    // Load from local storage
-    const storedUsers = localStorage.getItem('users');
-    if (storedUsers) {
-      this.users = JSON.parse(storedUsers);
-    }
+  constructor(private http: HttpClient) {}
+
+  // Signup new user
+  signup(user: { username: string; password: string; role: string }): Observable<any> {
+    console.log('Signup payload:', user);
+    return this.http.post(`${this.baseUrl}/register`, user);
   }
 
-  signup(user: User): boolean {
-    if (this.users.find(u => u.email === user.email)) {
-      return false; // User exists
-    }
-    this.users.push(user);
-    localStorage.setItem('users', JSON.stringify(this.users));
-    this.currentUser.next(user);
-    return true;
+  // Login existing user
+  login(username: string, password: string): Observable<{ token: string; user: User }> {
+    console.log('Login payload:', { username, password });
+    return this.http.post<{ token: string; user: User }>(`${this.baseUrl}/login`, { username, password }).pipe(
+      tap((res) => {
+        console.log('Login response:', res);
+        if (res?.token) {
+          localStorage.setItem('token', res.token); // Save JWT
+        }
+      })
+    );
   }
 
-  login(email: string, password: string): boolean {
-    const user = this.users.find(u => u.email === email && u.password === password);
-    if (user) {
-      this.currentUser.next(user);
-      return true;
-    }
-    return false;
-  }
-
-  logout() {
-    this.currentUser.next(null);
-  }
-
-  getUser() {
-    return this.currentUser.asObservable();
+  // Fetch profile using stored token
+  getProfile(): Observable<User> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+    return this.http.get<User>(`${this.baseUrl}/profile`, { headers });
   }
 
   isLoggedIn(): boolean {
-    return !!this.currentUser.value;
+    return !!localStorage.getItem('token');
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
   }
 }

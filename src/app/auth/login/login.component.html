@@ -5,27 +5,20 @@
     Your browser does not support the video tag.
   </video>
 
-  <!-- Login form -->
+  <!-- Login / Signup form -->
   <form class="login-form">
     <h2>{{ isSignup ? 'Sign Up' : 'Login' }}</h2>
 
+    <!-- Username (for both login & signup) -->
     <input
-      *ngIf="isSignup"
       type="text"
-      [(ngModel)]="name"
-      placeholder="Name"
+      [(ngModel)]="username"
+      placeholder="Username"
       required
       [ngModelOptions]="{standalone: true}"
     />
 
-    <input
-      type="email"
-      [(ngModel)]="email"
-      placeholder="Email"
-      required
-      [ngModelOptions]="{standalone: true}"
-    />
-
+    <!-- Password -->
     <input
       type="password"
       [(ngModel)]="password"
@@ -34,16 +27,35 @@
       [ngModelOptions]="{standalone: true}"
     />
 
-    <button type="button" (click)="submit()" class="primary-btn">
-      {{ isSignup ? 'Create Account' : 'Login' }}
+    <!-- Confirm password (only for signup) -->
+    <input
+      *ngIf="isSignup"
+      type="password"
+      [(ngModel)]="confirmPassword"
+      placeholder="Confirm Password"
+      required
+      [ngModelOptions]="{standalone: true}"
+    />
+
+    <!-- Submit button -->
+    <button
+      type="button"
+      (click)="submit()"
+      class="primary-btn"
+      [disabled]="loading"
+    >
+      {{ loading ? 'Please wait...' : (isSignup ? 'Create Account' : 'Login') }}
     </button>
 
+    <!-- Error -->
     <p class="error" *ngIf="error">{{ error }}</p>
 
+    <!-- Toggle link -->
     <a class="toggle-link" (click)="toggleMode()">
       {{ isSignup ? 'Already have an account? Login' : 'New user? Sign Up' }}
     </a>
 
-    <button class="skip-btn" (click)="skip()">Skip for Now</button>
+    <!-- Skip -->
+    <button type="button" class="skip-btn" (click)="skip()">Skip for Now</button>
   </form>
 </div>

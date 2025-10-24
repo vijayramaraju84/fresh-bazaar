@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../auth/auth.service';
-import { User } from '../../auth/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -9,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
-
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -28,13 +26,22 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  user: User | null = null;
+  user: any = null;
   searchQuery = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
-    this.authService.getUser().subscribe(user => this.user = user);
+    // If token exists, load profile
+    if (this.authService.isLoggedIn()) {
+      this.authService.getProfile().subscribe({
+        next: (data) => (this.user = data),
+        error: (err) => {
+          console.error('Failed to load user profile:', err);
+          this.authService.logout();
+        }
+      });
+    }
   }
 
   search() {
