@@ -1,5 +1,5 @@
-<mat-toolbar class="header">
-  <span class="logo">Fresh Bazaar</span>
+<mat-toolbar class="header" role="toolbar">
+  <span class="logo" role="img" aria-label="Fresh Bazaar Logo">Fresh Bazaar</span>
 
   <!-- Search Box -->
   <div class="search">
@@ -16,19 +16,69 @@
   </div>
 
   <div class="user-menu">
-    <button mat-icon-button *ngIf="!user" routerLink="/login" matTooltip="Login" class="icon-btn">
-      <mat-icon>person</mat-icon>
+    <!-- User Dropdown -->
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="userMenu"
+      matTooltip="User options"
+      class="icon-btn"
+      aria-label="User menu"
+    >
+      <mat-icon>{{ user ? 'person' : 'login' }}</mat-icon>
     </button>
+    <mat-menu #userMenu="matMenu" xPosition="before" class="user-menu-dropdown">
+      <ng-container *ngIf="user; else notLoggedIn">
+        <!-- Profile Section -->
+        <div class="profile-section" mat-menu-item disabled>
+          <span class="profile-label">Logged in as:</span>
+          <span class="profile-username">{{ user.username }}</span>
+          <span class="profile-role">{{ user.role || 'User' }}</span>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item routerLink="/orders" aria-label="View my orders">
+          <mat-icon>shopping_bag</mat-icon>
+          <span>My Orders</span>
+        </button>
+        <button mat-menu-item routerLink="/settings" aria-label="Account settings">
+          <mat-icon>settings</mat-icon>
+          <span>Settings</span>
+        </button>
+        <button *ngIf="user.role === 'ADMIN'" mat-menu-item routerLink="/admin/products/create" aria-label="Create product">
+          <mat-icon>add_circle</mat-icon>
+          <span>Create Product</span>
+        </button>
+        <button mat-menu-item (click)="logout()" aria-label="Log out">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </ng-container>
+      <ng-template #notLoggedIn>
+        <button mat-menu-item routerLink="/login" aria-label="Log in">
+          <mat-icon>login</mat-icon>
+          <span>Login</span>
+        </button>
+      </ng-template>
+    </mat-menu>
 
-    <button mat-icon-button *ngIf="user" (click)="logout()" matTooltip="Logout" class="icon-btn">
-      <mat-icon>logout</mat-icon>
-    </button>
-
-    <button mat-icon-button routerLink="/cart" matTooltip="Cart" class="icon-btn">
+    <!-- Cart Button -->
+    <button
+      mat-icon-button
+      routerLink="/cart"
+      matTooltip="View shopping cart"
+      class="icon-btn"
+      aria-label="Shopping cart"
+    >
       <mat-icon>shopping_cart</mat-icon>
     </button>
 
-    <button mat-icon-button routerLink="/categories" matTooltip="Categories" class="icon-btn">
+    <!-- Categories Button -->
+    <button
+      mat-icon-button
+      routerLink="/categories"
+      matTooltip="Browse categories"
+      class="icon-btn"
+      aria-label="Categories"
+    >
       <mat-icon>category</mat-icon>
     </button>
   </div>

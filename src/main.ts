@@ -11,17 +11,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { provideHttpClient } from '@angular/common/http';
-import { LoginComponent } from './app/auth/login/login.component';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideRouter([
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'login', component: LoginComponent },
-      // { path: 'home', component: HomeComponent },
-      // { path: 'cart', component: CartComponent },
-      { path: '**', redirectTo: 'home' } // catch-all
-    ]),
+    provideRouter(routes),
     provideAnimations(),
     provideHttpClient(),
     importProvidersFrom(

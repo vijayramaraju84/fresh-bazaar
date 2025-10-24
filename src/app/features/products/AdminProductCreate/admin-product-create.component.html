@@ -1,0 +1,72 @@
+<div class="admin-product-create" *ngIf="user && user.role === 'ADMIN'; else accessDenied">
+  <h2>Add New Product</h2>
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" required aria-label="Product name">
+      <mat-error *ngIf="productForm.get('name')?.hasError('required')">
+        Name is required
+      </mat-error>
+      <mat-error *ngIf="productForm.get('name')?.hasError('minlength')">
+        Name must be at least 3 characters
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" aria-label="Product description"></textarea>
+      <mat-error *ngIf="productForm.get('description')?.hasError('maxlength')">
+        Description cannot exceed 500 characters
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Price</mat-label>
+      <input matInput type="number" formControlName="price" required aria-label="Product price">
+      <mat-error *ngIf="productForm.get('price')?.hasError('required')">
+        Price is required
+      </mat-error>
+      <mat-error *ngIf="productForm.get('price')?.hasError('min')">
+        Price must be non-negative
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Stock</mat-label>
+      <input matInput type="number" formControlName="stock" required aria-label="Product stock">
+      <mat-error *ngIf="productForm.get('stock')?.hasError('required')">
+        Stock is required
+      </mat-error>
+      <mat-error *ngIf="productForm.get('stock')?.hasError('min')">
+        Stock must be non-negative
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Category</mat-label>
+      <mat-select formControlName="category" required aria-label="Product category">
+        <mat-option *ngFor="let category of categories" [value]="category">{{ category }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="productForm.get('category')?.hasError('required')">
+        Category is required
+      </mat-error>
+    </mat-form-field>
+
+    <div class="file-input">
+      <label for="image-upload">Product Image</label>
+      <input id="image-upload" type="file" accept="image/*" (change)="onFileChange($event)" required aria-label="Upload product image">
+      <mat-error *ngIf="productForm.get('image')?.hasError('required')">
+        Image is required
+      </mat-error>
+    </div>
+
+    <button mat-raised-button color="accent" type="submit" [disabled]="productForm.invalid" aria-label="Create product">
+      Create Product
+    </button>
+    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+  </form>
+</div>
+
+<ng-template #accessDenied>
+  <div class="error-message">Access denied: Admin role required</div>
+</ng-template>

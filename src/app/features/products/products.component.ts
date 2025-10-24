@@ -1,20 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { CartService } from '../cart/cart.service';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  offer?: string;
-  category?: string;
-}
+import { ProductService, Product } from '../products/product.service';
 
 @Component({
   selector: 'app-products',
@@ -41,32 +34,59 @@ interface Product {
     ])
   ]
 })
-export class ProductsComponent implements OnInit {
-  products: Product[] = [
-    { id: 1, name: 'Starship Drone', price: 99.99, image: 'assets/drone.jpg', offer: '20% Off', category: 'Electronics' },
-    { id: 2, name: 'Galactic Headphones', price: 149.99, image: 'assets/headphones.jpg', offer: 'Buy 1 Get 1 Free', category: 'Electronics' },
-    { id: 3, name: 'Nebula Watch', price: 199.99, image: 'assets/watch.jpg', category: 'Accessories' }
-  ];
+export class ProductsComponent implements OnInit, OnDestroy {
+  products: Product[] = [];
   filteredProducts: Product[] = [];
-  featuredProducts: Product[] = this.products.filter(p => p.offer);
+  featuredProducts: Product[] = [];
   categories = [
     { name: 'Electronics', image: 'assets/electronics.jpg' },
     { name: 'Fashion', image: 'assets/fashion.jpg' },
     { name: 'Accessories', image: 'assets/accessories.jpg' }
   ];
   currentSlideIndex = 0;
+  private querySubscription: Subscription | null = null;
+  private autoSlideInterval: any;
 
   constructor(
     private route: ActivatedRoute,
-    private cartService: CartService
+    private cartService: CartService,
+    private productService: ProductService
   ) {}
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      const search = params['search']?.toLowerCase() || '';
-      this.filteredProducts = this.products.filter(p => p.name.toLowerCase().includes(search));
+    this.productService.getAllProducts().subscribe({
+      next: (products) => {
+        this.products = products;
+        this.featuredProducts = products.filter(p => p.offer);
+        this.updateFilteredProducts();
+      },
+      error: (err) => {
+        console.error('Failed to fetch products:', err);
+      }
     });
-    setInterval(() => this.nextSlide(), 5000);
+
+    this.querySubscription = this.route.queryParams.subscribe(params => {
+      this.updateFilteredProducts(params['search']?.toLowerCase() || '');
+    });
+
+    this.autoSlideInterval = setInterval(() => this.nextSlide(), 5000);
+  }
+
+  ngOnDestroy() {
+    if (this.querySubscription) {
+      this.querySubscription.unsubscribe();
+    }
+    if (this.autoSlideInterval) {
+      clearInterval(this.autoSlideInterval);
+    }
+  }
+
+  updateFilteredProducts(search: string = '') {
+    this.filteredProducts = this.products.filter(p => 
+      p.name.toLowerCase().includes(search) || 
+      p.description?.toLowerCase().includes(search) ||
+      p.category?.toLowerCase().includes(search)
+    );
   }
 
   nextSlide() {
