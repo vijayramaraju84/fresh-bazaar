@@ -9,7 +9,8 @@ export interface Product {
   price: number;
   stock?: number;
   category?: string;
-  image?: string;
+  imageBase64?: string;
+  image?: string; // ✅ Added for UI display
   offer?: string;
 }
 
@@ -31,5 +32,9 @@ export class ProductService {
       Authorization: `Bearer ${token}`
     });
     return this.http.post(`${this.baseUrl}/create`, formData, { headers });
+  }
+
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.baseUrl}/getbyid?id=${id}`);
   }
 }

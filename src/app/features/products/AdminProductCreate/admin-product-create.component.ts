@@ -26,7 +26,7 @@ import { ProductService } from '../../products/product.service';
 export class AdminProductCreateComponent implements OnInit {
   productForm: FormGroup;
   user: User | null = null;
-  categories = ['Electronics', 'Fashion', 'Accessories'];
+  categories = ['Electronics', 'Fashion', 'Accessories', 'Vegetables', 'LeafyVegetables', 'Fruits'];
   errorMessage: string | null = null;
 
   constructor(

@@ -1,5 +1,5 @@
 <mat-toolbar class="header" role="toolbar">
-  <span class="logo" role="img" aria-label="Fresh Bazaar Logo">Fresh Bazaar</span>
+  <span class="logo" role="img" aria-label="Fresh Bazaar Logo" (click)="goHome()">Fresh Bazaar</span>
 
   <!-- Search Box -->
   <div class="search">
@@ -60,15 +60,16 @@
       </ng-template>
     </mat-menu>
 
-    <!-- Cart Button -->
+    <!-- Cart Button with Badge -->
     <button
       mat-icon-button
       routerLink="/cart"
       matTooltip="View shopping cart"
-      class="icon-btn"
+      class="icon-btn cart-btn"
       aria-label="Shopping cart"
     >
       <mat-icon>shopping_cart</mat-icon>
+      <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
     </button>
 
     <!-- Categories Button -->

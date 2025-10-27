@@ -1,1 +1,37 @@
-<p>cart works!</p>
+<div class="cart-container" *ngIf="cartItems.length > 0; else emptyCart">
+  <h2>Your Cart</h2>
+  <div class="cart-items">
+    <div class="cart-item" *ngFor="let item of cartItems">
+      <div class="item-details">
+        <h3>{{ item.name }}</h3>
+        <p>Price: ₹{{ item.price | number:'1.2-2' }}</p>
+        <mat-form-field appearance="fill" class="quantity-input">
+          <mat-label>Quantity</mat-label>
+          <input matInput type="number" min="1" [(ngModel)]="item.quantity" (ngModelChange)="updateQuantity(item)" attr.aria-label="Quantity for {{ item.name }}">
+        </mat-form-field>
+      </div>
+      <div class="item-total">
+        <p>Total: ₹{{ (item.price * item.quantity) | number:'1.2-2' }}</p>
+        <button mat-icon-button color="warn" (click)="removeItem(item.productId)" attr.aria-label="Remove {{ item.name }} from cart">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="cart-summary">
+    <h3>Total: ₹{{ totalPrice | number:'1.2-2' }}</h3>
+    <button mat-raised-button color="accent" (click)="proceedToCheckout()" aria-label="Proceed to checkout">
+      Proceed to Checkout
+    </button>
+  </div>
+</div>
+
+<ng-template #emptyCart>
+  <div class="empty-cart">
+    <h2>Your Cart is Empty</h2>
+    <p>Add some products to your cart to get started!</p>
+    <button mat-raised-button color="primary" routerLink="/products" aria-label="Continue shopping">
+      Continue Shopping
+    </button>
+  </div>
+</ng-template>

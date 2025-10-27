@@ -11,6 +11,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AuthService, User } from '../../auth/auth.service';
+import { CartService } from '../../features/cart/cart.service';
 
 @Component({
   selector: 'app-header',
@@ -33,11 +34,17 @@ import { AuthService, User } from '../../auth/auth.service';
 export class HeaderComponent implements OnInit, OnDestroy {
   user: User | null = null;
   searchQuery: string = '';
+  cartItemCount: number = 0;
   private userSubscription: Subscription | null = null;
+  private cartCountSubscription: Subscription | null = null;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private cartService: CartService,
+    private router: Router
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
       this.userSubscription = this.authService.getProfile().subscribe({
         next: (user: User) => (this.user = user),
@@ -48,15 +55,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
         }
       });
     }
+    this.cartCountSubscription = this.cartService.getCartCount().subscribe(count => {
+      this.cartItemCount = count;
+    });
   }
 
-  ngOnDestroy() {
-    if (this.userSubscription) {
-      this.userSubscription.unsubscribe();
-    }
+  ngOnDestroy(): void {
+    this.userSubscription?.unsubscribe();
+    this.cartCountSubscription?.unsubscribe();
   }
 
-  search() {
+  goHome(): void {
+    this.router.navigate(['/products']); // Changed to /products for consistency
+  }
+
+  search(): void {
     if (!this.searchQuery.trim()) {
       console.warn('Search query is empty');
       return;
@@ -65,7 +78,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigate(['/products'], { queryParams: { search: this.searchQuery.trim() } });
   }
 
-  logout() {
+  logout(): void {
     this.authService.logout();
     this.user = null;
     this.router.navigate(['/login']);

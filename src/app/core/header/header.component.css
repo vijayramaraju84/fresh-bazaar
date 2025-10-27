@@ -12,6 +12,7 @@
 }
 
 .logo {
+  cursor: pointer;
   font-family: 'Orbitron', sans-serif;
   font-size: 28px;
   color: var(--accent-color, #ff9800);

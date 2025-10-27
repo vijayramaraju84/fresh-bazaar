@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface CartItem {
   productId: number;
@@ -12,18 +12,63 @@ export interface CartItem {
   providedIn: 'root'
 })
 export class CartService {
-  private cart = new BehaviorSubject<CartItem[]>([]);
-  cart$ = this.cart.asObservable();
+  private cartItems: CartItem[] = [];
+  private cartCountSubject = new BehaviorSubject<number>(0);
 
-  addToCart(item: CartItem) {
-    const currentCart = this.cart.value;
-    const existingItem = currentCart.find(i => i.productId === item.productId);
+  constructor() {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      this.cartItems = JSON.parse(savedCart);
+      this.updateCartCount();
+    }
+  }
+
+  addToCart(item: CartItem): void {
+    const existingItem = this.cartItems.find(i => i.productId === item.productId);
     if (existingItem) {
       existingItem.quantity += item.quantity;
     } else {
-      currentCart.push(item);
+      this.cartItems.push({ ...item });
     }
-    this.cart.next(currentCart);
-    localStorage.setItem('cart', JSON.stringify(currentCart));
+    this.saveCart();
+    this.updateCartCount();
+  }
+
+  getCartItems(): CartItem[] {
+    return [...this.cartItems];
+  }
+
+  updateQuantity(productId: number, quantity: number): void {
+    const item = this.cartItems.find(i => i.productId === productId);
+    if (item && quantity > 0) {
+      item.quantity = quantity;
+      this.saveCart();
+      this.updateCartCount();
+    }
+  }
+
+  removeFromCart(productId: number): void {
+    this.cartItems = this.cartItems.filter(i => i.productId !== productId);
+    this.saveCart();
+    this.updateCartCount();
+  }
+
+  getCartCount(): Observable<number> {
+    return this.cartCountSubject.asObservable();
+  }
+
+  private saveCart(): void {
+    localStorage.setItem('cart', JSON.stringify(this.cartItems));
+  }
+
+  private updateCartCount(): void {
+    const count = this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    this.cartCountSubject.next(count);
+  }
+
+  clearCart(): void {
+    this.cartItems = [];
+    this.saveCart();
+    this.updateCartCount();
   }
 }
