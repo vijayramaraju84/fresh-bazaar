@@ -1,0 +1,36 @@
+
+<div class="confirmation-container" *ngIf="order; else noOrder">
+  <h2>Order Confirmation</h2>
+  <h3>Thank you for your order!</h3>
+  <div class="order-details">
+    <p><strong>Order ID:</strong> {{ order.orderId }}</p>
+    <p><strong>Placed on:</strong> {{ order.createdAt | date:'medium' }}</p>
+    <p><strong>Shipping Address:</strong> {{ order.shippingAddress }}</p>
+    <p><strong>Payment Method:</strong> {{ order.paymentMethod | titlecase }}</p>
+  </div>
+  <div class="order-items">
+    <h3>Items</h3>
+    <div class="cart-item" *ngFor="let item of order.items">
+      <div class="item-details">
+        <h4>{{ item.name }}</h4>
+        <p>Price: ₹{{ item.price | number:'1.2-2' }}</p>
+        <p>Quantity: {{ item.quantity }}</p>
+        <p>Subtotal: ₹{{ (item.price * item.quantity) | number:'1.2-2' }}</p>
+      </div>
+    </div>
+  </div>
+  <h3>Total: ₹{{ getTotalPrice() | number:'1.2-2' }}</h3>
+  <button mat-raised-button color="primary" routerLink="/products" aria-label="Continue shopping">
+    Continue Shopping
+  </button>
+</div>
+
+<ng-template #noOrder>
+  <div class="no-order">
+    <h2>No Order Found</h2>
+    <p>Please complete the checkout process to view order details.</p>
+    <button mat-raised-button color="primary" routerLink="/cart" aria-label="Back to cart">
+      Back to Cart
+    </button>
+  </div>
+</ng-template>

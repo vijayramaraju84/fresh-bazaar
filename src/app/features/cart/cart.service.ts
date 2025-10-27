@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { AuthService, User } from '../../auth/auth.service';
 
 export interface CartItem {
   productId: number;
@@ -8,67 +10,106 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface ShippingAddress {
+  name: string;
+  phoneNumber: string;
+  email: string;
+  address: string;
+  isImportant: boolean;
+}
+
+export interface Order {
+  orderId: number;
+  userId: number;
+  items: CartItem[];
+  totalPrice: number;
+  shippingAddress: ShippingAddress;
+  paymentMethod: string;
+  createdAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
-  private cartItems: CartItem[] = [];
-  private cartCountSubject = new BehaviorSubject<number>(0);
+  private cartKey = 'cartItems';
+  private ordersKey = 'orders';
+  private cartCountSubject = new BehaviorSubject<number>(this.getCartCount());
 
-  constructor() {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      this.cartItems = JSON.parse(savedCart);
-      this.updateCartCount();
-    }
-  }
+  constructor(private authService: AuthService) {}
 
   addToCart(item: CartItem): void {
-    const existingItem = this.cartItems.find(i => i.productId === item.productId);
+    const cartItems = this.getCartItems();
+    const existingItem = cartItems.find(i => i.productId === item.productId);
     if (existingItem) {
       existingItem.quantity += item.quantity;
     } else {
-      this.cartItems.push({ ...item });
+      cartItems.push(item);
     }
-    this.saveCart();
-    this.updateCartCount();
+    localStorage.setItem(this.cartKey, JSON.stringify(cartItems));
+    this.cartCountSubject.next(this.getCartCount());
   }
 
   getCartItems(): CartItem[] {
-    return [...this.cartItems];
+    const items = localStorage.getItem(this.cartKey);
+    return items ? JSON.parse(items) : [];
   }
 
   updateQuantity(productId: number, quantity: number): void {
-    const item = this.cartItems.find(i => i.productId === productId);
-    if (item && quantity > 0) {
+    const cartItems = this.getCartItems();
+    const item = cartItems.find(i => i.productId === productId);
+    if (item && quantity >= 1) {
       item.quantity = quantity;
-      this.saveCart();
-      this.updateCartCount();
+      localStorage.setItem(this.cartKey, JSON.stringify(cartItems));
+      this.cartCountSubject.next(this.getCartCount());
     }
   }
 
   removeFromCart(productId: number): void {
-    this.cartItems = this.cartItems.filter(i => i.productId !== productId);
-    this.saveCart();
-    this.updateCartCount();
+    const cartItems = this.getCartItems().filter(i => i.productId !== productId);
+    localStorage.setItem(this.cartKey, JSON.stringify(cartItems));
+    this.cartCountSubject.next(this.getCartCount());
   }
 
-  getCartCount(): Observable<number> {
+  getCartCount(): number {
+    return this.getCartItems().reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  getCartCountObservable(): Observable<number> {
     return this.cartCountSubject.asObservable();
   }
 
-  private saveCart(): void {
-    localStorage.setItem('cart', JSON.stringify(this.cartItems));
-  }
-
-  private updateCartCount(): void {
-    const count = this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    this.cartCountSubject.next(count);
-  }
-
   clearCart(): void {
-    this.cartItems = [];
-    this.saveCart();
-    this.updateCartCount();
+    localStorage.setItem(this.cartKey, JSON.stringify([]));
+    this.cartCountSubject.next(0);
+  }
+
+  createOrder(shippingAddress: ShippingAddress, paymentMethod: string): Observable<Order> {
+    return this.authService.getProfile().pipe(
+      map((user: User) => {
+        const cartItems = this.getCartItems();
+        if (!cartItems.length) throw new Error('Cart is empty');
+        const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const order: Order = {
+          orderId: Date.now(),
+          userId: user.id,
+          items: cartItems,
+          totalPrice,
+          shippingAddress,
+          paymentMethod,
+          createdAt: new Date().toISOString()
+        };
+        const orders = this.getOrders();
+        orders.push(order);
+        localStorage.setItem(this.ordersKey, JSON.stringify(orders));
+        this.clearCart();
+        return order;
+      })
+    );
+  }
+
+  private getOrders(): Order[] {
+    const orders = localStorage.getItem(this.ordersKey);
+    return orders ? JSON.parse(orders) : [];
   }
 }

@@ -1,1 +1,59 @@
-<p>checkout works!</p>
+<div class="checkout-container">
+  <h2>Checkout</h2>
+  <div class="order-summary">
+    <h3>Order Summary</h3>
+    <div class="cart-items">
+      <div class="cart-item" *ngFor="let item of cartItems">
+        <div class="item-details">
+          <h4>{{ item.name }}</h4>
+          <p>Price: ₹{{ item.price | number:'1.2-2' }}</p>
+          <p>Quantity: {{ item.quantity }}</p>
+          <p>Subtotal: ₹{{ (item.price * item.quantity) | number:'1.2-2' }}</p>
+        </div>
+      </div>
+    </div>
+    <h3>Total: ₹{{ totalPrice | number:'1.2-2' }}</h3>
+  </div>
+
+  <div class="checkout-form">
+    <h3>Shipping Address</h3>
+    <div *ngIf="error" class="error" role="alert" aria-live="assertive">{{ error }}</div>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput [(ngModel)]="shippingAddress.name" readonly aria-label="Name (auto-filled from profile)">
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Phone Number</mat-label>
+      <input matInput [(ngModel)]="shippingAddress.phoneNumber" placeholder="Enter 10-digit phone number" aria-label="Phone number">
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="shippingAddress.email" placeholder="Enter email address" aria-label="Email address">
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Address</mat-label>
+      <textarea matInput [(ngModel)]="shippingAddress.address" placeholder="Enter shipping address" aria-label="Shipping address"></textarea>
+    </mat-form-field>
+    <mat-checkbox [(ngModel)]="shippingAddress.isImportant" aria-label="Mark as important">Mark as Important</mat-checkbox>
+
+    <h3>Payment Method</h3>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Payment Method</mat-label>
+      <mat-select [(ngModel)]="paymentMethod" aria-label="Select payment method">
+        <mat-option value="credit_card">Credit Card</mat-option>
+        <mat-option value="debit_card">Debit Card</mat-option>
+        <mat-option value="upi">UPI</mat-option>
+        <mat-option value="cash_on_delivery">Cash on Delivery</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="confirmOrder()" aria-label="Confirm order">
+        Confirm Order
+      </button>
+      <button mat-raised-button color="warn" routerLink="/cart" aria-label="Back to cart">
+        Back to Cart
+      </button>
+    </div>
+  </div>
+</div>

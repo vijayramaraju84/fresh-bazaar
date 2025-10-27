@@ -1,5 +1,5 @@
 
-.checkout-container {
+.confirmation-container {
   max-width: 800px;
   margin: 20px auto;
   padding: 20px;
@@ -15,20 +15,26 @@ h2 {
   margin-bottom: 20px;
 }
 
-.order-summary {
-  margin-bottom: 20px;
+h3 {
+  font-size: 20px;
+  margin: 10px 0;
+  color: var(--accent-color, #ff9800);
 }
 
-.cart-items {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.order-details p {
+  margin: 5px 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.order-items {
+  margin: 20px 0;
 }
 
 .cart-item {
   padding: 15px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
+  margin-bottom: 10px;
 }
 
 .item-details h4 {
@@ -41,34 +47,6 @@ h2 {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.order-summary h3 {
-  font-size: 20px;
-  margin: 10px 0;
-  color: var(--accent-color, #ff9800);
-}
-
-.checkout-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.full-width {
-  width: 100%;
-}
-
-.full-width textarea {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  min-height: 100px;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
 button[mat-raised-button] {
   background: var(--accent-color, #ff9800);
   color: #000;
@@ -76,17 +54,25 @@ button[mat-raised-button] {
   padding: 10px 20px;
 }
 
-button[mat-raised-button][color="warn"] {
-  background: #ff5252;
+.no-order {
+  text-align: center;
+  padding: 50px;
+  color: #fff;
+}
+
+.no-order h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.no-order p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 20px;
 }
 
 @media (max-width: 768px) {
-  .checkout-container {
+  .confirmation-container {
     padding: 15px;
-  }
-
-  .actions {
-    flex-direction: column;
-    align-items: stretch;
   }
 }

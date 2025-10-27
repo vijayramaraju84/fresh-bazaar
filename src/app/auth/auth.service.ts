@@ -1,11 +1,12 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
 export interface User {
-  id?: number;
+  id: number;
   username: string;
-  role?: string;
+  role: string;
 }
 
 @Injectable({
@@ -16,26 +17,23 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // Signup new user
   signup(user: { username: string; password: string; role: string }): Observable<any> {
     console.log('Signup payload:', user);
     return this.http.post(`${this.baseUrl}/register`, user);
   }
 
-  // Login existing user
   login(username: string, password: string): Observable<{ token: string; user: User }> {
     console.log('Login payload:', { username, password });
     return this.http.post<{ token: string; user: User }>(`${this.baseUrl}/login`, { username, password }).pipe(
       tap((res) => {
         console.log('Login response:', res);
         if (res?.token) {
-          localStorage.setItem('token', res.token); // Save JWT
+          localStorage.setItem('token', res.token);
         }
       })
     );
   }
 
-  // Fetch profile using stored token
   getProfile(): Observable<User> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
