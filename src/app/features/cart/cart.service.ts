@@ -35,20 +35,25 @@ export class CartService {
   private cartKey = 'cartItems';
   private ordersKey = 'orders';
   private cartCountSubject = new BehaviorSubject<number>(this.getCartCount());
+  private itemAddedSource = new BehaviorSubject<CartItem | null>(null);
+  itemAdded$ = this.itemAddedSource.asObservable();
 
   constructor(private authService: AuthService) {}
 
   addToCart(item: CartItem): void {
-    const cartItems = this.getCartItems();
-    const existingItem = cartItems.find(i => i.productId === item.productId);
-    if (existingItem) {
-      existingItem.quantity += item.quantity;
-    } else {
-      cartItems.push(item);
-    }
-    localStorage.setItem(this.cartKey, JSON.stringify(cartItems));
-    this.cartCountSubject.next(this.getCartCount());
+  const cartItems = this.getCartItems();
+  const existingItem = cartItems.find(i => i.productId === item.productId);
+  if (existingItem) {
+    existingItem.quantity += item.quantity;
+  } else {
+    cartItems.push(item);
   }
+  localStorage.setItem(this.cartKey, JSON.stringify(cartItems));
+  this.cartCountSubject.next(this.getCartCount());
+
+  // Emit item added event
+  this.itemAddedSource.next(item);
+}
 
   getCartItems(): CartItem[] {
     const items = localStorage.getItem(this.cartKey);

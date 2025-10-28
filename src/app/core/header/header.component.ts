@@ -36,6 +36,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   user: User | null = null;
   searchQuery: string = '';
   cartItemCount: number = 0;
+  userMenuOpen = false;
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -64,6 +65,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
         error: (err) => console.error('Failed to fetch cart count:', err)
       })
     );
+
+    this.cartService.itemAdded$.subscribe(() => {
+    const cartBtn = document.querySelector('.cart-icon') as HTMLElement;
+    if (cartBtn) {
+      cartBtn.classList.add('pulse');
+      setTimeout(() => cartBtn.classList.remove('pulse'), 600);
+    }
+  });
   }
 
   ngOnDestroy(): void {

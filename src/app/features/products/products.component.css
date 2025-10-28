@@ -159,3 +159,77 @@ button[mat-raised-button] {
   padding: 50px;
   color: #fff;
 }
+
+.slider-add-btn {
+  margin-top: 15px;
+  width: 100%;
+}
+
+.product-card app-add-to-cart-button,
+.slide-content app-add-to-cart-button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ────────────────────────────────────────
+   NEBULA LOADER – centered full-screen
+   ──────────────────────────────────────── */
+.nebula-loader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #050511;               /* deep nebula background */
+  z-index: 9999;
+}
+
+/* ────── SPINNER ────── */
+.nebula-spinner {
+  width: 70px;
+  height: 70px;
+  border: 6px solid transparent;
+  border-top: 6px solid #6a1b9a;      /* neon pink */
+  border-right: 6px solid #00b0ff;    /* neon cyan */
+  border-radius: 50%;
+  position: relative;
+  animation: spin 1.2s linear infinite;
+}
+
+/* GLOW */
+.nebula-spinner::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #6a1b9a 0%, transparent 70%);
+  filter: blur(12px);
+  opacity: 0.8;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* SMOKE / NEBULA CLOUDS */
+.nebula-spinner::after {
+  content: "";
+  position: absolute;
+  inset: -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(5, 255, 163, 0.15) 0%, transparent 80%);
+  filter: blur(20px);
+  animation: smoke 3s ease-in-out infinite alternate;
+}
+
+/* ────── ANIMATIONS ────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50%      { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes smoke {
+  0%   { transform: translateY(0) scale(1); opacity: 0.3; }
+  100% { transform: translateY(-10px) scale(1.2); opacity: 0.1; }
+}

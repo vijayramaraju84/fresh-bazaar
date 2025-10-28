@@ -1,5 +1,6 @@
+
 <div class="main-features" *ngIf="products.length > 0; else loading">
-  <!-- 🌟 Featured Products Slider -->
+  <!-- Featured Products Slider -->
   <div class="slider-container" *ngIf="featuredProducts.length > 0">
     <button mat-icon-button class="nav-btn prev" (click)="prevSlide()" aria-label="Previous slide">
       <mat-icon>chevron_left</mat-icon>
@@ -13,9 +14,12 @@
           <h3>{{ product.name }}</h3>
           <p *ngIf="product.offer" class="offer">{{ product.offer }}</p>
           <p>₹{{ product.price }}</p>
-          <button mat-raised-button color="accent" (click)="addToCart(product)">
-            Add to Cart
-          </button>
+          <app-add-to-cart-button
+            [product]="product"
+            buttonText="Add to Cart"
+            (added)="onItemAdded()"
+            class="slider-add-btn">
+          </app-add-to-cart-button>
         </div>
       </div>
     </div>
@@ -23,7 +27,8 @@
       <mat-icon>chevron_right</mat-icon>
     </button>
   </div>
-  <!-- 🏷️ Categories Section -->
+
+  <!-- Categories Section -->
   <div class="categories-section" *ngIf="categories.length > 0">
     <h2>Explore Categories</h2>
     <div class="categories-grid">
@@ -36,21 +41,30 @@
       </a>
     </div>
   </div>
-  <!-- 🛒 Products Grid -->
+
+  <!-- Products Grid -->
   <div class="products-grid">
     <div *ngFor="let product of filteredProducts" class="product-card" @cardAnimation>
-      <img [src]="product.image" [alt]="product.name" />
+      <img [src]="product.image" alt="{{ product.name }}" class="product-image" />
       <h3>{{ product.name }}</h3>
       <p>₹{{ product.price }}</p>
-      <button mat-raised-button color="primary" (click)="addToCart(product)">
-        Add to Cart
-      </button>
+      <app-add-to-cart-button
+        [product]="product"
+        buttonText="Add to Cart"
+        (added)="onItemAdded()">
+      </app-add-to-cart-button>
     </div>
   </div>
 </div>
-<!-- 🔄 Loading Template -->
+
+<!-- Loading Template -->
+<!-- Loading Template -->
+<!-- Loading Template -->
 <ng-template #loading>
-  <div class="loading">
-    <p>Loading products...</p>
+  <div class="nebula-loader">
+    <div class="nebula-spinner"></div>
   </div>
 </ng-template>
+
+<!-- Toast Notification -->
+<app-toast></app-toast>

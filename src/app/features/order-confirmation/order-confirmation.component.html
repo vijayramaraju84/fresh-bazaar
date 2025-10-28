@@ -5,8 +5,13 @@
   <div class="order-details">
     <p><strong>Order ID:</strong> {{ order.orderId }}</p>
     <p><strong>Placed on:</strong> {{ order.createdAt | date:'medium' }}</p>
-    <p><strong>Shipping Address:</strong> {{ order.shippingAddress }}</p>
-    <p><strong>Payment Method:</strong> {{ order.paymentMethod | titlecase }}</p>
+    <h4>Shipping Address</h4>
+    <p><strong>Name:</strong> {{ order.shippingAddress.name }}</p>
+    <p><strong>Phone Number:</strong> {{ order.shippingAddress.phoneNumber }}</p>
+    <p><strong>Email:</strong> {{ order.shippingAddress.email }}</p>
+    <p><strong>Address:</strong> {{ order.shippingAddress.address }}</p>
+    <p><strong>Important:</strong> {{ order.shippingAddress.isImportant ? 'Yes' : 'No' }}</p>
+    <p><strong>Payment Method:</strong> {{ formatPaymentMethod(order.paymentMethod) }}</p>
   </div>
   <div class="order-items">
     <h3>Items</h3>

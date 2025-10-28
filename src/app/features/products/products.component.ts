@@ -7,11 +7,14 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { CartService } from '../cart/cart.service';
 import { ProductService, Product } from '../products/product.service';
+import { AddToCartButtonComponent } from '../products/add-to-cart-button/add-to-cart-button.component';
+import { ToastComponent } from '../toast/toast.component';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, CommonModule, RouterLink],
+  imports: [MatButtonModule, MatIconModule, CommonModule, RouterLink, AddToCartButtonComponent,
+    ToastComponent ],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
   animations: [
@@ -61,6 +64,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.querySubscription?.unsubscribe();
     clearInterval(this.autoSlideInterval);
+  }
+
+  onItemAdded(): void {
+    // Optional: scroll to top, show success, etc.
+    console.log('Item added to cart');
   }
 
   private loadProducts(): void {

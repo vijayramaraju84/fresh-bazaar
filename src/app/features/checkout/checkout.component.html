@@ -28,7 +28,7 @@
     </mat-form-field>
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Email</mat-label>
-      <input matInput [(ngModel)]="shippingAddress.email" placeholder="Enter email address" aria-label="Email address">
+      <input matInput [(ngModel)]="shippingAddress.email" placeholder="Enter email address (e.g., user@example.com)" aria-label="Email address">
     </mat-form-field>
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Address</mat-label>
@@ -48,10 +48,11 @@
     </mat-form-field>
 
     <div class="actions">
-      <button mat-raised-button color="primary" (click)="confirmOrder()" aria-label="Confirm order">
-        Confirm Order
+      <button mat-raised-button color="primary" (click)="confirmOrder()" [disabled]="loading" aria-label="Confirm order">
+        <span *ngIf="!loading">Confirm Order</span>
+        <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
       </button>
-      <button mat-raised-button color="warn" routerLink="/cart" aria-label="Back to cart">
+      <button mat-raised-button color="warn" routerLink="/cart" [disabled]="loading" aria-label="Back to cart">
         Back to Cart
       </button>
     </div>

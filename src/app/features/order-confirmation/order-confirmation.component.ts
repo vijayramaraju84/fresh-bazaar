@@ -1,3 +1,4 @@
+
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,5 +21,15 @@ export class OrderConfirmationComponent {
 
   getTotalPrice(): number {
     return this.order?.items.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
+  }
+
+  formatPaymentMethod(method: string): string {
+    const methodMap: { [key: string]: string } = {
+      'credit_card': 'Credit Card',
+      'debit_card': 'Debit Card',
+      'upi': 'UPI',
+      'cash_on_delivery': 'Cash on Delivery'
+    };
+    return methodMap[method] || method.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 }
