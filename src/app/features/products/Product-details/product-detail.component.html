@@ -1,0 +1,87 @@
+<div class="detail-backdrop" (click)="close.emit()">
+  <div class="detail-container" (click)="$event.stopPropagation()">
+    
+    <!-- Close Button -->
+    <button mat-icon-button class="close-btn" (click)="close.emit()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <div class="detail-grid">
+
+      <!-- Image Section -->
+      <div class="image-section">
+        <img [src]="product.image" [alt]="product.name" class="detail-image" />
+        <div class="image-thumbs" *ngIf="product.images?.length">
+          <img *ngFor="let img of product.images" [src]="img" class="thumb" />
+        </div>
+      </div>
+
+      <!-- Details Section -->
+      <div class="details-section">
+        <h1 class="product-title">{{ product.name }}</h1>
+
+        <!-- Rating -->
+        <div class="rating" *ngIf="product.rating">
+          <mat-icon *ngFor="let star of getStars(product.rating)" class="star">
+            {{ star }}
+          </mat-icon>
+          <span class="rating-count">({{ product.reviews || 0 }} reviews)</span>
+        </div>
+
+        <!-- Price -->
+        <div class="price-box">
+          <span class="price">₹{{ product.price }}</span>
+          <span class="mrp" *ngIf="product.mrp && product.mrp > product.price">
+            ₹{{ product.mrp }}
+          </span>
+          <span class="discount" *ngIf="product.mrp && product.mrp > product.price">
+            {{ getDiscountPercent(product) }}% off
+          </span>
+        </div>
+
+        <!-- Prime -->
+        <div class="prime-badge" *ngIf="product.prime">
+          <mat-icon>local_shipping</mat-icon>
+          <span>Free Delivery</span>
+        </div>
+
+        <!-- Stock -->
+        <p class="stock" [class.low]="product.stock && product.stock < 5">
+          {{ product.stock === 0 ? 'Out of Stock' : (product.stock || 0) + ' in stock' }}
+        </p>
+
+        <!-- Description -->
+        <div class="description" *ngIf="product.description">
+          <h3>Description</h3>
+          <p>{{ product.description }}</p>
+        </div>
+
+        <!-- Features -->
+        <div class="features" *ngIf="product.features?.length">
+          <h3>Key Features</h3>
+          <ul>
+            <li *ngFor="let f of product.features">{{ f }}</li>
+          </ul>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <app-add-to-cart-button
+            [product]="product"
+            buttonText="Add to Cart"
+            [disabled]="product.stock === 0"
+            (added)="onAdded()"
+            class="add-btn">
+          </app-add-to-cart-button>
+
+          <button mat-stroked-button class="wishlist-btn"
+                  [class.active]="product.wishlisted"
+                  (click)="toggleWishlist()">
+            <mat-icon>{{ product.wishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>
+            {{ product.wishlisted ? 'Wishlisted' : 'Add to Wishlist' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,9 @@
 <mat-toolbar class="header" role="toolbar">
-  <span class="logo" role="img" aria-label="Fresh Bazaar Logo" (click)="goHome()">Fresh Bazaar</span>
+  <!-- Logo -->
+  <span class="logo" role="button" tabindex="0" (click)="goHome()" (keyup.enter)="goHome()" 
+        aria-label="Go to Fresh Bazaar home">
+    Fresh Bazaar
+  </span>
 
   <!-- Search Box -->
   <div class="search">
@@ -11,77 +15,80 @@
       (keyup.enter)="search()"
       aria-label="Search products"
     />
-    <button mat-icon-button class="search-btn" (click)="search()" matTooltip="Search" aria-label="Search">
+    <button mat-icon-button class="search-btn" (click)="search()" 
+            matTooltip="Search" aria-label="Search">
       <mat-icon>search</mat-icon>
     </button>
   </div>
 
+  <!-- Right Side Icons -->
   <div class="user-menu">
-    <!-- User Dropdown -->
-    <button
-      mat-icon-button
-      [matMenuTriggerFor]="userMenu"
-      matTooltip="User options"
-      class="icon-btn"
-      aria-label="User menu"
-    >
+
+    <!-- User Menu -->
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" 
+            class="icon-btn" matTooltip="Account" aria-label="Open user menu">
       <mat-icon>{{ user ? 'person' : 'login' }}</mat-icon>
     </button>
+
     <mat-menu #userMenu="matMenu" xPosition="before" class="user-menu-dropdown">
-      <ng-container *ngIf="user; else notLoggedIn">
-        <!-- Profile Section -->
-        <div class="profile-section" mat-menu-item disabled ariaLabel="Logged in user info">
-          <span class="profile-label">Logged in as:</span>
-          <span class="profile-username">{{ user.username }}</span>
-          <span class="profile-role">{{ user.role || 'User' }}</span>
+      <ng-container *ngIf="user; else loginTemplate">
+        <!-- User Info -->
+        <div class="profile-section" mat-menu-item disabled>
+          <div class="profile-info">
+            <mat-icon class="profile-icon">person</mat-icon>
+            <div>
+              <div class="profile-username">{{ user.username }}</div>
+              <div class="profile-role">{{ user.role || 'Customer' }}</div>
+            </div>
+          </div>
         </div>
         <mat-divider></mat-divider>
-        <button mat-menu-item routerLink="/orders" ariaLabel="View my orders">
+
+        <!-- Menu Items -->
+        <button mat-menu-item routerLink="/orders">
           <mat-icon>shopping_bag</mat-icon>
           <span>My Orders</span>
         </button>
-        <button mat-menu-item routerLink="/settings" ariaLabel="Account settings">
+
+        <button mat-menu-item routerLink="/settings">
           <mat-icon>settings</mat-icon>
           <span>Settings</span>
         </button>
-        <button *ngIf="user.role === 'ADMIN'" mat-menu-item routerLink="/admin/products/create" ariaLabel="Create product">
+
+        <!-- Admin Only -->
+        <button *ngIf="user.role === 'ADMIN'" mat-menu-item routerLink="/admin/products/create">
           <mat-icon>add_circle</mat-icon>
           <span>Create Product</span>
         </button>
-        <button mat-menu-item (click)="logout()" ariaLabel="Log out">
+
+        <mat-divider></mat-divider>
+
+        <button mat-menu-item (click)="logout()">
           <mat-icon>logout</mat-icon>
           <span>Logout</span>
         </button>
       </ng-container>
-      <ng-template #notLoggedIn>
-        <button mat-menu-item routerLink="/login" ariaLabel="Log in">
+
+      <ng-template #loginTemplate>
+        <button mat-menu-item routerLink="/login">
           <mat-icon>login</mat-icon>
           <span>Login</span>
         </button>
       </ng-template>
     </mat-menu>
 
-    <!-- Cart Button with Badge -->
-    <button
-      mat-icon-button
-      routerLink="/cart"
-      matTooltip="View shopping cart"
-      class="icon-btn cart-btn cart-icon"
-      [attr.aria-label]="'Shopping cart with ' + cartItemCount + ' items'"
-    >
+    <!-- Cart with Badge -->
+    <button mat-icon-button routerLink="/cart" class="icon-btn cart-btn cart-icon"
+            matTooltip="View cart" [attr.aria-label]="'Cart with ' + cartItemCount + ' items'">
       <mat-icon>shopping_cart</mat-icon>
       <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
     </button>
 
-    <!-- Categories Button -->
-    <button
-      mat-icon-button
-      routerLink="/categories"
-      matTooltip="Browse categories"
-      class="icon-btn"
-      aria-label="Categories"
-    >
+    <!-- Categories -->
+    <button mat-icon-button routerLink="/categories" class="icon-btn"
+            matTooltip="Browse categories" aria-label="Categories">
       <mat-icon>category</mat-icon>
     </button>
+
   </div>
 </mat-toolbar>

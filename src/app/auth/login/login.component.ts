@@ -1,18 +1,31 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+// src/app/auth/login/login.component.ts
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService, User } from '../auth.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AuthStateService } from '../auth-state.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   isSignup = false;
   username = '';
   password = '';
@@ -20,74 +33,77 @@ export class LoginComponent {
   error = '';
   loading = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  // Skip goes to PUBLIC route (must NOT be protected by AuthGuard)
+  private skipUrl = '/products';  // CHANGE IF YOU HAVE /home
 
-  toggleMode() {
+  constructor(
+    private authState: AuthStateService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit(): void {
+    // Capture return URL (for login redirect)
+    const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+    const targetUrl = returnUrl || '/products';
+
+    // If already logged in → go to target
+    if (this.authState.isLoggedIn()) {
+      this.router.navigate([targetUrl]);
+      return;
+    }
+  }
+
+  toggleMode(): void {
     this.isSignup = !this.isSignup;
     this.error = '';
   }
 
-  submit() {
+  submit(): void {
     this.error = '';
     this.loading = true;
 
     if (this.isSignup) {
-      // Validate confirm password
       if (this.password !== this.confirmPassword) {
         this.error = 'Passwords do not match!';
         this.loading = false;
         return;
       }
 
-      // Signup user with default role CUSTOMER
-      this.authService.signup({
+      this.authState.signup({
         username: this.username,
         password: this.password,
         role: 'CUSTOMER'
-      }).subscribe({
+      }).pipe(first()).subscribe({
         next: () => {
-          alert('Registration successful! Please login now.');
+          alert('Registration successful! Please login.');
           this.isSignup = false;
-          this.password = '';
-          this.confirmPassword = '';
+          this.password = this.confirmPassword = '';
           this.loading = false;
         },
         error: (err: HttpErrorResponse) => {
-          console.error('Signup error:', err);
-          this.error = err.error?.message || 'Registration failed. Try again.';
+          this.error = err.error?.message || 'Registration failed.';
           this.loading = false;
         }
       });
     } else {
-      // Login existing user
-      this.authService.login(this.username, this.password).subscribe({
-        next: (res) => {
-          console.log('Login success:', res);
-
-          // Fetch profile using token
-          this.authService.getProfile().subscribe({
-            next: (profile: User) => {
-              console.log('User Profile:', profile);
-              this.router.navigate(['/home']);
-            },
-            error: (err) => {
-              console.error('Profile fetch failed:', err);
-              this.router.navigate(['/home']);
-            }
-          });
-
-          this.loading = false;
-        },
-        error: (err: HttpErrorResponse) => {
-          console.error('Login error:', err);
-          this.error = err.error?.error || 'Invalid username or password.';
-          this.loading = false;
-        }
-      });
+      this.authState.login(this.username, this.password)
+        .pipe(first())
+        .subscribe({
+          next: () => {
+            const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/products';
+            this.router.navigate([returnUrl]);
+          },
+          error: (err: HttpErrorResponse) => {
+            this.error = err.error?.error || 'Invalid credentials.';
+            this.loading = false;
+          }
+        });
     }
   }
 
-  skip() {
-    this.router.navigate(['/home']);
+  // SKIP → MUST go to PUBLIC route (not protected by AuthGuard)
+  skip(): void {
+    this.router.navigate([this.skipUrl]);
   }
 }

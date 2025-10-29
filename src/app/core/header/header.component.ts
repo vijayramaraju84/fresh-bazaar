@@ -1,4 +1,4 @@
-
+// src/app/core/header/header.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -11,8 +11,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { AuthService, User } from '../../auth/auth.service';
-import { CartService } from '../.././features/cart/cart.service';
+import { AuthStateService } from '../../auth/auth-state.service';
+import { CartService } from '../../features/cart/cart.service';
+import { User } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -34,49 +35,41 @@ import { CartService } from '../.././features/cart/cart.service';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   user: User | null = null;
-  searchQuery: string = '';
-  cartItemCount: number = 0;
-  userMenuOpen = false;
-  private subscriptions: Subscription = new Subscription();
+  searchQuery = '';
+  cartItemCount = 0;
+  private subs = new Subscription();
 
   constructor(
-    private authService: AuthService,
+    private authState: AuthStateService,
     private cartService: CartService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    if (this.authService.isLoggedIn()) {
-      this.subscriptions.add(
-        this.authService.getProfile().subscribe({
-          next: (user: User) => (this.user = user),
-          error: (err: unknown) => {
-            console.error('Failed to load user profile:', err);
-            this.authService.logout();
-            this.user = null;
-            this.cartService.clearCart();
-          }
-        })
-      );
-    }
-    this.subscriptions.add(
-      this.cartService.getCartCountObservable().subscribe({
-        next: (count) => (this.cartItemCount = count),
-        error: (err) => console.error('Failed to fetch cart count:', err)
-      })
+    // Reactive user updates
+    this.subs.add(
+      this.authState.getUser$().subscribe(user => this.user = user)
     );
 
-    this.cartService.itemAdded$.subscribe(() => {
-    const cartBtn = document.querySelector('.cart-icon') as HTMLElement;
-    if (cartBtn) {
-      cartBtn.classList.add('pulse');
-      setTimeout(() => cartBtn.classList.remove('pulse'), 600);
-    }
-  });
+    // Cart count
+    this.subs.add(
+      this.cartService.getCartCountObservable().subscribe(count => this.cartItemCount = count)
+    );
+
+    // Pulse on add
+    this.subs.add(
+      this.cartService.itemAdded$.subscribe(() => {
+        const cartBtn = document.querySelector('.cart-icon') as HTMLElement;
+        if (cartBtn) {
+          cartBtn.classList.add('pulse');
+          setTimeout(() => cartBtn.classList.remove('pulse'), 600);
+        }
+      })
+    );
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
+    this.subs.unsubscribe();
   }
 
   goHome(): void {
@@ -84,17 +77,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   search(): void {
-    if (!this.searchQuery.trim()) {
-      console.warn('Search query is empty');
-      return;
-    }
-    console.log('Search:', this.searchQuery);
-    this.router.navigate(['/products'], { queryParams: { search: this.searchQuery.trim() } });
+    if (!this.searchQuery.trim()) return;
+    this.router.navigate(['/products'], {
+      queryParams: { search: this.searchQuery.trim() }
+    });
   }
 
   logout(): void {
-    this.authService.logout();
-    this.user = null;
+    this.authState.logout();
     this.cartService.clearCart();
     this.router.navigate(['/login']);
   }

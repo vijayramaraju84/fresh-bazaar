@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CartService, CartItem } from '../../cart/cart.service';
 import { ToastService } from '../../toast/toast.service';
 import { flyToCart } from '../../../shared/animations/cart-fly.animation';
+import { Product } from '../product.model';
 
 @Component({
   selector: 'app-add-to-cart-button',
@@ -55,13 +56,20 @@ import { flyToCart } from '../../../shared/animations/cart-fly.animation';
   `]
 })
 export class AddToCartButtonComponent implements AfterViewInit {
-  @Input() product!: any;
+  @Input() product!: Product;
   @Input() quantity = 1;
   @Input() buttonText = 'Add to Cart';
+  @Input() disabled = false;
   @Output() added = new EventEmitter<void>();
 
   @ViewChild('buttonRef') buttonRef!: ElementRef<HTMLElement>;
   @ContentChild('productImage', { static: false }) productImageRef!: ElementRef<HTMLImageElement>;
+
+  add(): void {
+    if (!this.disabled) {
+      this.added.emit();
+    }
+  }
 
   adding = false;
 
