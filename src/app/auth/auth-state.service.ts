@@ -8,33 +8,39 @@ import { AuthService, User } from './auth.service';
 export class AuthStateService {
   private user$ = new BehaviorSubject<User | null>(null);
   private isLoggedIn$ = new BehaviorSubject<boolean>(false);
-  private authReady$ = new ReplaySubject<void>(1);  // ← NEW
+  private loading$ = new BehaviorSubject<boolean>(true);   // ← NEW
+  private authReady$ = new ReplaySubject<void>(1);
 
   constructor(private authService: AuthService) {
     this.initializeAuth();
   }
 
   private initializeAuth(): void {
+    this.loading$.next(true);  // Start loading
+
     if (this.authService.isLoggedIn()) {
       this.authService.getProfile().subscribe({
         next: (user) => {
           this.user$.next(user);
           this.isLoggedIn$.next(true);
-          this.authReady$.next();  // ← Ready!
+          this.loading$.next(false);
+          this.authReady$.next();
         },
         error: () => {
           this.logout();
-          this.authReady$.next();  // ← Ready even if failed
+          this.loading$.next(false);
+          this.authReady$.next();
         }
       });
     } else {
-      this.authReady$.next();  // ← No token → ready
+      this.loading$.next(false);
+      this.authReady$.next();
     }
   }
 
-  /** Wait until auth is initialized */
-  waitForAuth(): Observable<void> {
-    return this.authReady$.pipe(first());
+  // Observable for spinner
+  getAuthLoading$(): Observable<boolean> {
+    return this.loading$.asObservable();
   }
 
   getUser$(): Observable<User | null> {
@@ -45,26 +51,38 @@ export class AuthStateService {
     return this.isLoggedIn$.value;
   }
 
+  waitForAuth(): Observable<void> {
+    return this.authReady$.pipe(first());
+  }
+
   login(username: string, password: string): Observable<{ token: string; user: User }> {
+    this.loading$.next(true);
     return this.authService.login(username, password).pipe(
       tap(res => {
         localStorage.setItem('token', res.token);
         this.user$.next(res.user);
         this.isLoggedIn$.next(true);
-        this.authReady$.next();
+        this.loading$.next(false);
       })
     );
   }
 
   signup(data: any): Observable<any> {
-    return this.authService.signup(data);
+    this.loading$.next(true);
+    return this.authService.signup(data).pipe(
+      tap({
+        next: () => this.loading$.next(false),
+        error: () => this.loading$.next(false)
+      })
+    );
   }
 
   logout(): void {
+    this.loading$.next(true);
     this.authService.logout();
     localStorage.removeItem('token');
     this.user$.next(null);
     this.isLoggedIn$.next(false);
-    this.authReady$.next();
+    setTimeout(() => this.loading$.next(false), 300); // Small delay for UX
   }
 }

@@ -1,76 +1,96 @@
+/* src/app/features/products/AdminProductCreate/admin-product-create.component.css */
 .admin-product-create {
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
   background: #1a1a1a;
-  color: #fff;
-  border-radius: 8px;
-}
-
-h2 {
-  font-family: 'Orbitron', sans-serif;
-  color: var(--accent-color, #ff9800);
-  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .product-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  gap: 1.5rem;
 }
 
 mat-form-field {
   width: 100%;
 }
 
-mat-form-field input,
-mat-form-field textarea,
-mat-form-field mat-select {
-  background: rgba(255,255,255,0.05);
-  color: #fff;
+.image-upload-section {
+  padding: 1rem;
+  border: 2px dashed #444;
+  border-radius: 8px;
+  background: #222;
 }
 
-mat-form-field ::placeholder {
-  color: rgba(255,255,255,0.6);
+.upload-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #ff9800;
 }
 
 .file-input {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.file-input label {
-  font-size: 14px;
-  color: #fff;
-}
-
-.file-input input {
-  padding: 8px;
-  background: rgba(255,255,255,0.05);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.1);
+  width: 100%;
+  padding: 0.5rem;
+  background: #333;
+  color: white;
   border-radius: 4px;
 }
 
-button[mat-raised-button] {
-  background: var(--accent-color, #ff9800);
-  color: #000;
-  font-weight: bold;
-  padding: 10px;
-  transition: transform 0.2s;
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-button[mat-raised-button]:hover:not(:disabled) {
-  transform: scale(1.05);
+.preview-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-button[mat-raised-button]:disabled {
-  background: rgba(255,152,0,0.5);
+.preview-img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0,0,0,0.6);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .error-message {
   color: #ff5252;
+  padding: 1rem;
+  background: rgba(255, 82, 82, 0.1);
+  border-radius: 6px;
+  border-left: 4px solid #ff5252;
+}
+
+.access-denied {
   text-align: center;
-  margin-top: 10px;
+  padding: 3rem;
+  color: #aaa;
+}
+
+.access-denied mat-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  color: #ff9800;
 }

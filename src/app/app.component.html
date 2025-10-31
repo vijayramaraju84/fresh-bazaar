@@ -1,4 +1,27 @@
 <app-header></app-header>
 <router-outlet></router-outlet>
+<ng-container *ngIf="authLoading$ | async as loading">
+  <div class="ecommerce-loading-overlay" *ngIf="loading" @fadeOut>
+    <div class="loading-content">
+      <div class="logo-container">
+        <div class="logo-pulse"></div>
+        <img src="/logo.svg" alt="Nebula Store" class="brand-logo" />
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+      <p class="loading-message">
+        <span class="typing">Preparing your shopping experience</span>
+        <span class="dots">...</span>
+      </p>
+      <p class="loading-tip">
+        Did you know? 80% of users abandon slow sites in under 3 seconds!
+      </p>
+    </div>
+  </div>
+</ng-container>
+
 <app-toast></app-toast>
 <app-footer></app-footer>

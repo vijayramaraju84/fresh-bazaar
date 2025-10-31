@@ -1,6 +1,9 @@
+<!-- src/app/features/products/AdminProductCreate/admin-product-create.component.html -->
 <div class="admin-product-create" *ngIf="user && user.role === 'ADMIN'; else accessDenied">
   <h2>Add New Product</h2>
+
   <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+    <!-- Name -->
     <mat-form-field appearance="fill">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" required aria-label="Product name">
@@ -12,14 +15,16 @@
       </mat-error>
     </mat-form-field>
 
+    <!-- Description -->
     <mat-form-field appearance="fill">
       <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description" aria-label="Product description"></textarea>
+      <textarea matInput formControlName="description" rows="4" aria-label="Product description"></textarea>
       <mat-error *ngIf="productForm.get('description')?.hasError('maxlength')">
         Description cannot exceed 500 characters
       </mat-error>
     </mat-form-field>
 
+    <!-- Price -->
     <mat-form-field appearance="fill">
       <mat-label>Price</mat-label>
       <input matInput type="number" formControlName="price" required aria-label="Product price">
@@ -31,6 +36,7 @@
       </mat-error>
     </mat-form-field>
 
+    <!-- Stock -->
     <mat-form-field appearance="fill">
       <mat-label>Stock</mat-label>
       <input matInput type="number" formControlName="stock" required aria-label="Product stock">
@@ -42,31 +48,80 @@
       </mat-error>
     </mat-form-field>
 
+    <!-- Category -->
     <mat-form-field appearance="fill">
       <mat-label>Category</mat-label>
       <mat-select formControlName="category" required aria-label="Product category">
-        <mat-option *ngFor="let category of categories" [value]="category">{{ category }}</mat-option>
+        <mat-option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </mat-option>
       </mat-select>
       <mat-error *ngIf="productForm.get('category')?.hasError('required')">
         Category is required
       </mat-error>
     </mat-form-field>
 
-    <div class="file-input">
-      <label for="image-upload">Product Image</label>
-      <input id="image-upload" type="file" accept="image/*" (change)="onFileChange($event)" required aria-label="Upload product image">
-      <mat-error *ngIf="productForm.get('image')?.hasError('required')">
-        Image is required
+    <!-- MULTIPLE IMAGE UPLOAD -->
+    <div class="image-upload-section">
+      <label class="upload-label">Product Images (up to 5)</label>
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        (change)="onFileChange($event)"
+        class="file-input"
+        aria-label="Upload product images"
+      >
+      <mat-hint>Hold Ctrl/Cmd to select multiple</mat-hint>
+
+      <!-- Image Previews -->
+      <div class="image-preview-grid" *ngIf="imagePreviews.length > 0">
+        <div class="preview-item" *ngFor="let preview of imagePreviews; let i = index">
+          <img [src]="preview" [alt]="'Preview ' + (i + 1)" class="preview-img">
+          <button
+            mat-icon-button
+            color="warn"
+            (click)="removeImage(i)"
+            class="remove-btn"
+            aria-label="Remove image">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <mat-error *ngIf="productForm.get('images')?.hasError('required') && imagePreviews.length === 0">
+        At least one image is required
       </mat-error>
     </div>
 
-    <button mat-raised-button color="accent" type="submit" [disabled]="productForm.invalid" aria-label="Create product">
-      Create Product
-    </button>
+    <!-- Submit -->
+    <div class="form-actions">
+      <button
+        mat-raised-button
+        color="accent"
+        type="submit"
+        [disabled]="productForm.invalid || imagePreviews.length === 0"
+        aria-label="Create product">
+        Create Product
+      </button>
+      <button mat-stroked-button type="button" (click)="router.navigate(['/products'])">
+        Cancel
+      </button>
+    </div>
+
+    <!-- Error Message -->
     <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
   </form>
 </div>
 
+<!-- Access Denied -->
 <ng-template #accessDenied>
-  <div class="error-message">Access denied: Admin role required</div>
+  <div class="access-denied">
+    <mat-icon>lock</mat-icon>
+    <h3>Access Denied</h3>
+    <p>Admin role required to create products.</p>
+    <button mat-button color="primary" (click)="router.navigate(['/products'])">
+      Go to Products
+    </button>
+  </div>
 </ng-template>
