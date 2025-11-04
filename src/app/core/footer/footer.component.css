@@ -1,18 +1,224 @@
+/* src/app/core/footer/footer.component.css */
+
+/* ROOT VARIABLES */
+:root {
+  --footer-bg: #1a1a1a;
+  --footer-text: #e0e0e0;
+  --footer-accent: #ff9800;
+  --footer-border: rgba(255, 152, 0, 0.2);
+}
+
 .footer {
-  background: var(--primary-color);
-  text-align: center;
-  padding: 20px;
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  font-family: 'Segoe UI', sans-serif;
+  border-top: 1px solid var(--footer-border);
+  margin-top: auto; /* Push to bottom */
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2rem;
+  padding: 3rem 2rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-brand {
+  text-align: left;
+}
+
+.footer-brand .logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #00B0FF;
+  margin: 0 0 0.5rem;
+  display: block;
+}
+
+.copyright {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* LINKS & SOCIAL */
+.footer-links,
+.footer-social {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.footer-links h4,
+.footer-social h4 {
+  margin: 0 0 0.5rem;
+  color: var(--footer-accent);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.link {
+  color: var(--footer-text);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
   position: relative;
-  bottom: 0;
+}
+
+.link:hover {
+  color: var(--footer-accent);
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background: var(--footer-accent);
+  transition: width 0.3s ease;
+}
+
+.link:hover::after {
   width: 100%;
 }
 
-.links a {
-  color: var(--text-color);
-  margin: 0 10px;
+/* SOCIAL ICONS */
+.social-icons {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: var(--footer-text);
+  transition: all 0.3s ease;
   text-decoration: none;
 }
 
+.social-link:hover {
+  background: var(--footer-accent);
+  color: #000;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.social-link mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* BOTTOM BAR */
+.footer-bottom {
+  text-align: center;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-bottom .heart {
+  color: #ff5252;
+  font-size: 16px;
+  vertical-align: middle;
+  animation: beat 1.5s infinite;
+}
+
+/* ANIMATIONS */
+@keyframes beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* RESPONSIVE */
+
+/* Tablet */
+@media (max-width: 992px) {
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 2.5rem 1.5rem 1.5rem;
+  }
+  .footer-brand { grid-column: 1 / -1; text-align: center; }
+}
+
+/* Mobile Large */
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 1.8rem;
+    padding: 2rem 1.2rem 1.2rem;
+  }
+
+  .footer-brand,
+  .footer-links,
+  .footer-social {
+    align-items: center;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
+}
+
+/* Mobile Small */
 @media (max-width: 480px) {
-  .links { display: flex; flex-direction: column; }
+  .footer-content {
+    padding: 1.8rem 1rem 1rem;
+    gap: 1.5rem;
+  }
+
+  .footer-brand .logo {
+    font-size: 1.5rem;
+  }
+
+  .footer-links h4,
+  .footer-social h4 {
+    font-size: 1rem;
+  }
+
+  .link {
+    font-size: 0.9rem;
+  }
+
+  .social-link {
+    width: 36px;
+    height: 36px;
+  }
+
+  .social-link mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .footer-bottom {
+    padding: 0.8rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Extra Small */
+@media (max-width: 360px) {
+  .footer-content {
+    padding: 1.5rem 0.8rem 1rem;
+  }
+
+  .footer-brand .logo {
+    font-size: 1.4rem;
+  }
 }

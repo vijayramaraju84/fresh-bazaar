@@ -1,8 +1,45 @@
+<!-- src/app/core/footer/footer.component.html -->
 <footer class="footer">
-  <p>&copy; 2025 Fresh Bazaar. All rights reserved.</p>
-  <div class="links">
-    <a routerLink="/about">About</a>
-    <a routerLink="/contact">Contact</a>
-    <a routerLink="/privacy">Privacy</a>
+  <div class="footer-content">
+    
+    <!-- Brand + Copyright -->
+    <div class="footer-brand">
+      <h3 class="logo">Fresh Bazaar</h3>
+      <p class="copyright">&copy; {{ currentYear }} Fresh Bazaar. All rights reserved.</p>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="footer-links">
+      <h4>Quick Links</h4>
+      <a routerLink="/about" class="link">About Us</a>
+      <a routerLink="/contact" class="link">Contact</a>
+      <a routerLink="/privacy" class="link">Privacy Policy</a>
+      <a routerLink="/terms" class="link">Terms of Service</a>
+    </div>
+
+    <!-- Social Icons -->
+    <div class="footer-social">
+      <h4>Follow Us</h4>
+      <div class="social-icons">
+        <a href="#" class="social-link" aria-label="Facebook">
+          <mat-icon>facebook</mat-icon>
+        </a>
+        <a href="#" class="social-link" aria-label="Instagram">
+          <mat-icon>instagram</mat-icon>
+        </a>
+        <a href="#" class="social-link" aria-label="Twitter">
+          <mat-icon>twitter</mat-icon>
+        </a>
+        <a href="#" class="social-link" aria-label="LinkedIn">
+          <mat-icon>linkedin</mat-icon>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="footer-bottom">
+    <p>Made with <mat-icon class="heart">favorite</mat-icon> in India</p>
   </div>
 </footer>

@@ -1,3 +1,4 @@
+// src/app/features/products/Product-details/product-detail.component.ts
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,7 +21,7 @@ import { Product } from '../product.model';
 export class ProductDetailComponent {
   @Input() product!: Product;
   @Output() close = new EventEmitter<void>();
-  @Output() added = new EventEmitter<void>();
+  @Output() added = new EventEmitter<Product>();  // ← NOW EMITS PRODUCT
 
   getStars(rating: number): string[] {
     const stars = [];
@@ -39,10 +40,10 @@ export class ProductDetailComponent {
   }
 
   toggleWishlist(): void {
-    this.product.wishlisted = !this.product.wishlisted;
-  }
+  this.product.wishlisted = !this.product.wishlisted;
+}
 
   onAdded(): void {
-    this.added.emit();
+    this.added.emit(this.product);  // ← EMIT THE PRODUCT
   }
 }

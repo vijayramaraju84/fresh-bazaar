@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
 import { AuthStateService } from '../auth-state.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { first } from 'rxjs/operators';
@@ -20,7 +21,8 @@ import { first } from 'rxjs/operators';
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatIconModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
@@ -28,13 +30,14 @@ import { first } from 'rxjs/operators';
 export class LoginComponent implements OnInit {
   isSignup = false;
   username = '';
+  email = '';
+  phoneNumber = '';
   password = '';
   confirmPassword = '';
   error = '';
   loading = false;
 
-  // Skip goes to PUBLIC route (must NOT be protected by AuthGuard)
-  private skipUrl = '/products';  // CHANGE IF YOU HAVE /home
+  private skipUrl = '/products';
 
   constructor(
     private authState: AuthStateService,
@@ -43,20 +46,23 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Capture return URL (for login redirect)
-    const returnUrl = this.route.snapshot.queryParams['returnUrl'];
-    const targetUrl = returnUrl || '/products';
-
-    // If already logged in → go to target
     if (this.authState.isLoggedIn()) {
-      this.router.navigate([targetUrl]);
-      return;
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/products';
+      this.router.navigate([returnUrl]);
     }
   }
 
   toggleMode(): void {
     this.isSignup = !this.isSignup;
     this.error = '';
+    this.resetForm();
+  }
+
+  private resetForm(): void {
+    this.email = '';
+    this.phoneNumber = '';
+    this.password = '';
+    this.confirmPassword = '';
   }
 
   submit(): void {
@@ -64,46 +70,53 @@ export class LoginComponent implements OnInit {
     this.loading = true;
 
     if (this.isSignup) {
+      // === SIGNUP ===
       if (this.password !== this.confirmPassword) {
         this.error = 'Passwords do not match!';
         this.loading = false;
         return;
       }
 
-      this.authState.signup({
+      const signupData = {
         username: this.username,
         password: this.password,
+        email: this.email,
+        phoneNumber: this.phoneNumber,
         role: 'CUSTOMER'
-      }).pipe(first()).subscribe({
+      };
+
+      this.authState.signup(signupData).pipe(first()).subscribe({
         next: () => {
-          alert('Registration successful! Please login.');
+          this.toast('Account created! Please login.');
           this.isSignup = false;
-          this.password = this.confirmPassword = '';
+          this.resetForm();
           this.loading = false;
         },
         error: (err: HttpErrorResponse) => {
-          this.error = err.error?.message || 'Registration failed.';
+          this.error = err.error?.message || 'Registration failed. Try again.';
           this.loading = false;
         }
       });
     } else {
-      this.authState.login(this.username, this.password)
-        .pipe(first())
-        .subscribe({
-          next: () => {
-            const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/products';
-            this.router.navigate([returnUrl]);
-          },
-          error: (err: HttpErrorResponse) => {
-            this.error = err.error?.error || 'Invalid credentials.';
-            this.loading = false;
-          }
-        });
+      // === LOGIN ===
+      this.authState.login(this.username, this.password).pipe(first()).subscribe({
+        next: () => {
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/products';
+          this.router.navigate([returnUrl]);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.error = err.error?.error || 'Invalid username or password.';
+          this.loading = false;
+        }
+      });
     }
   }
 
-  // SKIP → MUST go to PUBLIC route (not protected by AuthGuard)
   skip(): void {
     this.router.navigate([this.skipUrl]);
+  }
+
+  private toast(msg: string): void {
+    alert(msg); // Replace with ToastService later
   }
 }

@@ -1,83 +1,124 @@
+// src/app/features/cart/cart.service.ts
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { AuthService, User } from '../../auth/auth.service';
+import { tap, catchError, map } from 'rxjs/operators';
 
 export interface CartItem {
   productId: number;
-  name: string;
-  price: number;
+  productName: string;
+  productPrice: number;
   quantity: number;
 }
 
-export interface ShippingAddress {
-  name: string;
-  phoneNumber: string;
-  email: string;
-  address: string;
-  isImportant: boolean;
+export interface AddToCartRequest {
+  productId: number;
+  quantity: number;
 }
 
-export interface Order {
-  orderId: number;
-  userId: number;
-  items: CartItem[];
-  totalPrice: number;
-  shippingAddress: ShippingAddress;
-  paymentMethod: string;
-  createdAt: string;
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class CartService {
-  private cartKey = 'cartItems';
-  private ordersKey = 'orders';
-  private cartCountSubject = new BehaviorSubject<number>(this.getCartCount());
+  private apiUrl = 'https://cart-service-tabj.onrender.com/cart';
+
+  private cartCountSubject = new BehaviorSubject<number>(0);
   private itemAddedSource = new BehaviorSubject<CartItem | null>(null);
   itemAdded$ = this.itemAddedSource.asObservable();
 
-  constructor(private authService: AuthService) {}
-
-  addToCart(item: CartItem): void {
-  const cartItems = this.getCartItems();
-  const existingItem = cartItems.find(i => i.productId === item.productId);
-  if (existingItem) {
-    existingItem.quantity += item.quantity;
-  } else {
-    cartItems.push(item);
-  }
-  localStorage.setItem(this.cartKey, JSON.stringify(cartItems));
-  this.cartCountSubject.next(this.getCartCount());
-
-  // Emit item added event
-  this.itemAddedSource.next(item);
-}
-
-  getCartItems(): CartItem[] {
-    const items = localStorage.getItem(this.cartKey);
-    return items ? JSON.parse(items) : [];
+  constructor(private http: HttpClient) {
+    this.loadCartOnLogin();
   }
 
-  updateQuantity(productId: number, quantity: number): void {
-    const cartItems = this.getCartItems();
-    const item = cartItems.find(i => i.productId === productId);
-    if (item && quantity >= 1) {
-      item.quantity = quantity;
-      localStorage.setItem(this.cartKey, JSON.stringify(cartItems));
-      this.cartCountSubject.next(this.getCartCount());
+  loadCartOnLogin(): void {
+    if (localStorage.getItem('token')) {
+      this.loadCartCount();
     }
   }
 
-  removeFromCart(productId: number): void {
-    const cartItems = this.getCartItems().filter(i => i.productId !== productId);
-    localStorage.setItem(this.cartKey, JSON.stringify(cartItems));
-    this.cartCountSubject.next(this.getCartCount());
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
   }
 
-  getCartCount(): number {
-    return this.getCartItems().reduce((sum, item) => sum + item.quantity, 0);
+  // FIXED: Return CartItem, not string
+  addToCart(item: CartItem): Observable<CartItem> {
+    const req: AddToCartRequest = {
+      productId: item.productId,
+      quantity: item.quantity
+    };
+
+    return this.http.post<string>(
+      `${this.apiUrl}/add`,
+      req,
+      {
+        headers: this.getHeaders(),
+        responseType: 'text' as 'json'
+      }
+    ).pipe(
+      map(() => item),  // ← RETURN THE ITEM
+      tap(() => {
+        this.itemAddedSource.next(item);
+        this.loadCartCount();
+      }),
+      catchError(err => {
+        console.error('Add failed:', err);
+        throw err;
+      })
+    );
+  }
+
+  getCartItems(): Observable<CartItem[]> {
+    return this.http.get<CartItem[]>(this.apiUrl, { headers: this.getHeaders() })
+      .pipe(
+        tap(items => {
+          const count = items.reduce((sum, i) => sum + i.quantity, 0);
+          this.cartCountSubject.next(count);
+        }),
+        catchError(err => {
+          console.error('Get cart failed:', err);
+          this.cartCountSubject.next(0);
+          throw err;
+        })
+      );
+  }
+
+  updateQuantity(productId: number, quantity: number): Observable<CartItem> {
+    const req = { productId, quantity };
+
+    return this.http.put<string>(
+      `${this.apiUrl}/update`,
+      req,
+      {
+        headers: this.getHeaders(),
+        responseType: 'text' as 'json'
+      }
+    ).pipe(
+      map(() => ({ productId, quantity } as CartItem)), // return partial
+      tap(() => this.loadCartCount()),
+      catchError(err => {
+        console.error('Update failed:', err);
+        throw err;
+      })
+    );
+  }
+
+  removeFromCart(productId: number): Observable<number> {
+    return this.http.delete<string>(
+      `${this.apiUrl}/remove/${productId}`,
+      {
+        headers: this.getHeaders(),
+        responseType: 'text' as 'json'
+      }
+    ).pipe(
+      map(() => productId),
+      tap(() => this.loadCartCount()),
+      catchError(err => {
+        console.error('Remove failed:', err);
+        throw err;
+      })
+    );
   }
 
   getCartCountObservable(): Observable<number> {
@@ -85,36 +126,10 @@ export class CartService {
   }
 
   clearCart(): void {
-    localStorage.setItem(this.cartKey, JSON.stringify([]));
     this.cartCountSubject.next(0);
   }
 
-  createOrder(shippingAddress: ShippingAddress, paymentMethod: string): Observable<Order> {
-    return this.authService.getProfile().pipe(
-      map((user: User) => {
-        const cartItems = this.getCartItems();
-        if (!cartItems.length) throw new Error('Cart is empty');
-        const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        const order: Order = {
-          orderId: Date.now(),
-          userId: user.id,
-          items: cartItems,
-          totalPrice,
-          shippingAddress,
-          paymentMethod,
-          createdAt: new Date().toISOString()
-        };
-        const orders = this.getOrders();
-        orders.push(order);
-        localStorage.setItem(this.ordersKey, JSON.stringify(orders));
-        this.clearCart();
-        return order;
-      })
-    );
-  }
-
-  private getOrders(): Order[] {
-    const orders = localStorage.getItem(this.ordersKey);
-    return orders ? JSON.parse(orders) : [];
+  private loadCartCount(): void {
+    this.getCartItems().subscribe();
   }
 }

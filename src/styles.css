@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap');
 
 :root {
-  --primary-color: #6a1b9a; /* Purple nebula */
-  --accent-color: #00b0ff; /* Blue glow */
+  --primary-color: #6a1b9a;
+  --accent-color: #00b0ff;
   --bg-gradient: linear-gradient(135deg, #0d001a, #1a0033, #330066);
   --text-color: #e0e0e0;
   --holo-shadow: 0 0 15px rgba(0, 176, 255, 0.5);
@@ -42,7 +42,6 @@ button:hover {
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   body { font-size: 14px; }
   button { padding: 8px 16px; }
@@ -78,3 +77,95 @@ button:hover {
   justify-content: center;
   font-weight: bold;
 }
+
+/* ─────── NEBULA MENU & FILTERS ─────── */
+/* .mat-menu-panel {
+  background: #1a0033 !important;
+  border: 1px solid rgba(0, 176, 255, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 0 20px rgba(106, 27, 154, 0.6), 0 0 40px rgba(0, 176, 255, 0.2) !important;
+  margin-top: 8px;
+  animation: menuFloat 0.3s ease-out;
+} */
+
+.mat-menu-content { padding: 8px 0 !important; }
+
+.mat-menu-item {
+  color: #e0e0e0 !important;
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 0.95rem !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  padding: 0 20px !important;
+  transition: all 0.25s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.mat-menu-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 176, 255, 0.1));
+  transform: translateX(-100%);
+  transition: transform 0.4s ease;
+}
+
+.mat-menu-item:hover,
+.mat-menu-item:focus {
+  background: rgba(0, 176, 255, 0.15) !important;
+  color: #fff !important;
+}
+
+.mat-menu-item:hover::before {
+  transform: translateX(100%);
+}
+
+.mat-menu-item + .mat-menu-item {
+  border-top: 1px solid rgba(0, 176, 255, 0.15);
+}
+
+@keyframes menuFloat {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.filter-btn {
+  background: rgba(26, 0, 51, 0.7) !important;
+  color: #e0e0e0 !important;
+  border: 1px solid rgba(0, 176, 255, 0.4) !important;
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-family: 'Roboto', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 0.95rem !important;
+  padding: 0 16px !important;
+  height: 40px !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(4px);
+}
+
+.filter-btn:hover {
+  background: rgba(106, 27, 154, 0.6) !important;
+  border-color: #00b0ff !important;
+  box-shadow: 0 0 15px rgba(0, 176, 255, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+.filter-btn .mat-icon {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin-right: 8px !important;
+}
+
+/* src/styles.css – AT THE VERY END */
+:host ::ng-deep .mat-menu-panel {
+  background: #1a0033 !important;
+  /* ... rest of styles ... */
+}
+
+.search-field .mat-form-field-outline { color: rgba(0, 176, 255, 0.5) !important; }
+.search-field .mat-input-element { color: #e0e0e0 !important; caret-color: #00b0ff !important; }
+.search-field .mat-form-field-label { color: #aaa !important; }
+.search-field.mat-focused .mat-form-field-label { color: #00b0ff !important; }

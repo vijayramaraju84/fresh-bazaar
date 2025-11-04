@@ -5,10 +5,10 @@
     <div class="cart-items">
       <div class="cart-item" *ngFor="let item of cartItems">
         <div class="item-details">
-          <h4>{{ item.name }}</h4>
-          <p>Price: ₹{{ item.price | number:'1.2-2' }}</p>
+          <h4>{{ item.productName }}</h4>
+          <p>Price: ₹{{ item.productPrice | number:'1.2-2' }}</p>
           <p>Quantity: {{ item.quantity }}</p>
-          <p>Subtotal: ₹{{ (item.price * item.quantity) | number:'1.2-2' }}</p>
+          <p>Subtotal: ₹{{ (item.productPrice * item.quantity) | number:'1.2-2' }}</p>
         </div>
       </div>
     </div>
@@ -20,7 +20,7 @@
     <div *ngIf="error" class="error" role="alert" aria-live="assertive">{{ error }}</div>
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Name</mat-label>
-      <input matInput [(ngModel)]="shippingAddress.name" readonly aria-label="Name (auto-filled from profile)">
+      <input matInput [(ngModel)]="shippingAddress.name"  aria-label="Name (auto-filled from profile)">
     </mat-form-field>
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Phone Number</mat-label>

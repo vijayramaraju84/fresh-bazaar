@@ -1,126 +1,295 @@
-/* Full screen container */
+/* src/app/auth/login/login.component.css */
+
+/* ROOT VARIABLES */
+:root {
+  --bg-dark: #0a0a0a;
+  --card-bg: rgba(26, 26, 26, 0.85);
+  --accent: #ff9800;
+  --accent-hover: #ffb74d;
+  --text: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.7);
+  --error: #ff5252;
+  --border: rgba(255, 152, 0, 0.3);
+}
+
+/* FULL SCREEN CONTAINER */
 .login-container {
   position: relative;
+  min-height: 100vh;
+  min-height: 100dvh; /* For mobile */
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  /* background: linear-gradient(135deg, #1a1a1a, #333); */
-  font-family: 'Arial', sans-serif;
+  padding: 1rem;
+  overflow: hidden;
+  background: var(--bg-dark);
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
 }
 
-/* Nebula background */
+/* NEBULA VIDEO BACKGROUND */
 .nebula-bg {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   object-fit: cover;
   z-index: 0;
-  opacity: 0.3;
+  opacity: 0.4;
+  filter: brightness(0.8) contrast(1.2);
 }
 
-/* Form */
+/* GLASSMORPHISM FORM CARD */
 .login-form {
   position: relative;
   z-index: 1;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 40px 30px;
-  border-radius: 12px;
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px var(--border);
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-  text-align: center;
-  color: #fff;
+  gap: 1.2rem;
+  animation: fadeIn 0.6s ease-out;
 }
 
-/* Heading */
+/* HEADING */
 .login-form h2 {
-  margin-bottom: 25px;
+  margin: 0 0 0.5rem;
   font-family: 'Orbitron', sans-serif;
-  color: var(--accent-color, #ff9800);
-  letter-spacing: 1px;
+  font-weight: 600;
+  font-size: clamp(1.6rem, 5vw, 2rem);
+  text-align: center;
+  color: var(--accent);
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 8px rgba(255, 152, 0, 0.3);
 }
 
-/* Inputs */
-.login-form input {
+/* FORM FIELDS */
+mat-form-field {
   width: 100%;
-  padding: 12px 15px;
-  margin-bottom: 15px;
-  border-radius: 6px;
-  border: none;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-  font-size: 16px;
 }
 
-.login-form input::placeholder {
-  color: rgba(255,255,255,0.6);
+mat-form-field ::ng-deep .mat-form-field-wrapper {
+  padding-bottom: 0;
 }
 
-/* Buttons */
-.primary-btn {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  background: var(--accent-color, #ff9800);
-  color: #000;
-  font-weight: bold;
-  font-size: 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
+mat-form-field ::ng-deep .mat-form-field-underline {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
-.primary-btn:hover {
-  background: #ffc107;
-  transform: scale(1.05);
+mat-form-field ::ng-deep .mat-form-field-label {
+  color: var(--text-muted) !important;
 }
 
-/* Skip button */
-.skip-btn {
-  background: transparent;
-  border: 1px solid #fff;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: all 0.2s;
+mat-form-field ::ng-deep .mat-input-element {
+  color: var(--text) !important;
+  caret-color: var(--accent);
 }
 
-.skip-btn:hover {
-  background: rgba(255,255,255,0.1);
+mat-form-field ::ng-deep .mat-form-field-outline {
+  color: rgba(255, 255, 255, 0.2);
 }
 
-/* Error message */
-.error {
-  color: #ff6b6b;
-  font-size: 14px;
-  margin: 5px 0;
+mat-form-field ::ng-deep .mat-form-field-outline-thick {
+  color: var(--accent) !important;
 }
 
-/* Toggle link */
+/* HINT & ERROR */
+mat-hint {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+mat-error {
+  font-size: 0.75rem;
+  color: var(--error);
+}
+
+/* SUBMIT BUTTON */
+.submit-btn {
+  height: 52px !important;
+  font-weight: 600 !important;
+  font-size: 1.05rem !important;
+  border-radius: 12px !important;
+  background: var(--accent) !important;
+  color: #d3c500 !important;
+  text-transform: none !important;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.submit-btn:hover:not([disabled]) {
+  background: var(--accent-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
+}
+
+.submit-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ERROR MESSAGE */
+.error-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 82, 82, 0.15);
+  color: var(--error);
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  border-left: 4px solid var(--error);
+  animation: slideIn 0.3s ease-out;
+}
+
+/* TOGGLE LINK */
+.toggle-text {
+  text-align: center;
+  margin: 0.5rem 0 0;
+}
+
 .toggle-link {
-  margin-top: 10px;
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent);
+  transition: all 0.2s;
   cursor: pointer;
-  font-size: 14px;
-  color: var(--accent-color, #ff9800);
-  transition: color 0.2s;
 }
 
 .toggle-link:hover {
-  color: #ffc107;
+  color: var(--accent-hover);
+  border-bottom-style: solid;
 }
 
-/* Responsive */
-@media (max-width: 480px) {
+/* SKIP BUTTON */
+.skip-btn {
+  height: 44px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: var(--text);
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-transform: none;
+}
+
+.skip-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* RESPONSIVE BREAKPOINTS */
+
+/* Large Tablets */
+@media (max-width: 992px) {
   .login-form {
-    padding: 30px 20px;
+    padding: 2rem 1.8rem;
+    max-width: 400px;
+  }
+}
+
+/* Small Tablets */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1rem;
+  }
+  
+  .login-form {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    gap: 1rem;
+  }
+
+  .submit-btn {
+    height: 50px;
+    font-size: 1rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 0.5rem;
+  }
+
+  .login-form {
+    padding: 1.8rem 1.2rem;
+    border-radius: 14px;
+    max-width: 100%;
+    gap: 0.9rem;
+  }
+
+  .login-form h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+  }
+
+  mat-form-field {
+    margin-bottom: 0.5rem;
+  }
+
+  .submit-btn {
+    height: 48px;
+    font-size: 0.95rem;
+  }
+
+  .skip-btn {
+    height: 42px;
+    font-size: 0.9rem;
+  }
+
+  .error-msg {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+/* Extra Small */
+@media (max-width: 360px) {
+  .login-form {
+    padding: 1.5rem 1rem;
+  }
+
+  .submit-btn, .skip-btn {
+    height: 46px;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .login-container {
+    min-height: 100dvh;
+    padding: 1rem;
+  }
+
+  .login-form {
+    padding: 1.5rem;
+    max-height: 90dvh;
+    overflow-y: auto;
   }
 }

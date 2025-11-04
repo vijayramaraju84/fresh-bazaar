@@ -1,61 +1,148 @@
+<!-- src/app/auth/login/login.component.html -->
 <div class="login-container">
-  <!-- Video background -->
-  <video autoplay muted loop class="nebula-bg">
-    <source src="nebula.mp4" type="video/mp4">
-    Your browser does not support the video tag.
+  <!-- Video Background -->
+  <video autoplay muted loop playsinline class="nebula-bg">
+    <source src="/nebula.mp4" type="video/mp4">
+    Your browser does not support video.
   </video>
 
-  <!-- Login / Signup form -->
-  <form class="login-form">
-    <h2>{{ isSignup ? 'Sign Up' : 'Login' }}</h2>
+  <!-- Login / Signup Form -->
+  <form class="login-form" (ngSubmit)="submit()" #loginForm="ngForm">
+    <h2>{{ isSignup ? 'Create Account' : 'Welcome Back' }}</h2>
 
-    <!-- Username (for both login & signup) -->
-    <input
-      type="text"
-      [(ngModel)]="username"
-      placeholder="Username"
-      required
-      [ngModelOptions]="{standalone: true}"
-    />
+    <!-- Username -->
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Username</mat-label>
+      <input
+        matInput
+        type="text"
+        [(ngModel)]="username"
+        name="username"
+        required
+        minlength="3"
+        [disabled]="loading"
+      />
+      <mat-error *ngIf="loginForm.controls['username']?.errors?.['required']">
+        Username is required
+      </mat-error>
+      <mat-error *ngIf="loginForm.controls['username']?.errors?.['minlength']">
+        Minimum 3 characters
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Email (Signup only) -->
+    <mat-form-field appearance="fill" class="full-width" *ngIf="isSignup">
+      <mat-label>Email</mat-label>
+      <input
+        matInput
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        required
+        email
+        [disabled]="loading"
+      />
+      <mat-error *ngIf="loginForm.controls['email']?.errors?.['required']">
+        Email is required
+      </mat-error>
+      <mat-error *ngIf="loginForm.controls['email']?.errors?.['email']">
+        Invalid email format
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Phone (Signup only) -->
+    <mat-form-field appearance="fill" class="full-width" *ngIf="isSignup">
+      <mat-label>Phone Number</mat-label>
+      <input
+        matInput
+        type="tel"
+        [(ngModel)]="phoneNumber"
+        name="phoneNumber"
+        required
+        pattern="[0-9]{10}"
+        [disabled]="loading"
+      />
+      <mat-hint>10-digit mobile number</mat-hint>
+      <mat-error *ngIf="loginForm.controls['phoneNumber']?.errors?.['required']">
+        Phone is required
+      </mat-error>
+      <mat-error *ngIf="loginForm.controls['phoneNumber']?.errors?.['pattern']">
+        Enter 10 digits only
+      </mat-error>
+    </mat-form-field>
 
     <!-- Password -->
-    <input
-      type="password"
-      [(ngModel)]="password"
-      placeholder="Password"
-      required
-      [ngModelOptions]="{standalone: true}"
-    />
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Password</mat-label>
+      <input
+        matInput
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        required
+        minlength="6"
+        [disabled]="loading"
+      />
+      <mat-error *ngIf="loginForm.controls['password']?.errors?.['required']">
+        Password is required
+      </mat-error>
+      <mat-error *ngIf="loginForm.controls['password']?.errors?.['minlength']">
+        Minimum 6 characters
+      </mat-error>
+    </mat-form-field>
 
-    <!-- Confirm password (only for signup) -->
-    <input
-      *ngIf="isSignup"
-      type="password"
-      [(ngModel)]="confirmPassword"
-      placeholder="Confirm Password"
-      required
-      [ngModelOptions]="{standalone: true}"
-    />
+    <!-- Confirm Password (Signup only) -->
+    <mat-form-field appearance="fill" class="full-width" *ngIf="isSignup">
+      <mat-label>Confirm Password</mat-label>
+      <input
+        matInput
+        type="password"
+        [(ngModel)]="confirmPassword"
+        name="confirmPassword"
+        required
+        [disabled]="loading"
+      />
+      <mat-error *ngIf="confirmPassword && password !== confirmPassword">
+        Passwords do not match
+      </mat-error>
+    </mat-form-field>
 
-    <!-- Submit button -->
+    <!-- Submit Button -->
     <button
-      type="button"
-      (click)="submit()"
-      class="primary-btn"
-      [disabled]="loading"
+      mat-raised-button
+      color="accent"
+      type="submit"
+      class="submit-btn"
+      [disabled]="loading || loginForm.invalid || (isSignup && password !== confirmPassword)"
     >
-      {{ loading ? 'Please wait...' : (isSignup ? 'Create Account' : 'Login') }}
+      <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+      <span *ngIf="!loading">
+        {{ isSignup ? 'Create Account' : 'Login' }}
+      </span>
     </button>
 
-    <!-- Error -->
-    <p class="error" *ngIf="error">{{ error }}</p>
+    <!-- Error Message -->
+    <div class="error-msg" *ngIf="error">
+      <mat-icon>error</mat-icon>
+      {{ error }}
+    </div>
 
-    <!-- Toggle link -->
-    <a class="toggle-link" (click)="toggleMode()">
-      {{ isSignup ? 'Already have an account? Login' : 'New user? Sign Up' }}
-    </a>
+    <!-- Toggle Mode -->
+    <p class="toggle-text">
+      <a (click)="toggleMode()" class="toggle-link">
+        {{ isSignup ? 'Already have an account? Login' : 'New user? Sign Up' }}
+      </a>
+    </p>
 
-    <!-- Skip -->
-    <button type="button" class="skip-btn" (click)="skip()">Skip for Now</button>
+    <!-- Skip Button -->
+    <button
+      mat-stroked-button
+      type="button"
+      class="skip-btn"
+      (click)="skip()"
+      [disabled]="loading"
+    >
+      Skip for Now
+    </button>
   </form>
 </div>

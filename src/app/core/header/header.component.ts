@@ -1,5 +1,5 @@
 // src/app/core/header/header.component.ts
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -9,11 +9,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { CartService } from '../../features/cart/cart.service';
 import { User } from '../../auth/auth.service';
+import { SearchDialogComponent } from './search-dialog.component';
 
 @Component({
   selector: 'app-header',
@@ -27,6 +29,7 @@ import { User } from '../../auth/auth.service';
     MatFormFieldModule,
     MatMenuModule,
     MatDividerModule,
+    MatDialogModule,
     RouterLink,
     CommonModule
   ],
@@ -39,30 +42,30 @@ export class HeaderComponent implements OnInit, OnDestroy {
   cartItemCount = 0;
   private subs = new Subscription();
 
+  @ViewChild('mobileSearchInput', { static: false }) mobileSearchInput?: ElementRef<HTMLInputElement>;
+
   constructor(
     private authState: AuthStateService,
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    // Reactive user updates
     this.subs.add(
       this.authState.getUser$().subscribe(user => this.user = user)
     );
 
-    // Cart count
     this.subs.add(
       this.cartService.getCartCountObservable().subscribe(count => this.cartItemCount = count)
     );
 
-    // Pulse on add
     this.subs.add(
       this.cartService.itemAdded$.subscribe(() => {
-        const cartBtn = document.querySelector('.cart-icon') as HTMLElement;
-        if (cartBtn) {
-          cartBtn.classList.add('pulse');
-          setTimeout(() => cartBtn.classList.remove('pulse'), 600);
+        const btn = document.querySelector('.cart-icon') as HTMLElement;
+        if (btn) {
+          btn.classList.add('pulse');
+          setTimeout(() => btn.classList.remove('pulse'), 600);
         }
       })
     );
@@ -77,9 +80,28 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   search(): void {
-    if (!this.searchQuery.trim()) return;
-    this.router.navigate(['/products'], {
-      queryParams: { search: this.searchQuery.trim() }
+    if (this.searchQuery.trim()) {
+      this.router.navigate(['/products'], {
+        queryParams: { search: this.searchQuery.trim() }
+      });
+      this.searchQuery = ''; // Clear after search
+    }
+  }
+
+  openSearchDialog(): void {
+    const dialogRef = this.dialog.open(SearchDialogComponent, {
+      width: '90vw',
+      maxWidth: '400px',
+      panelClass: 'search-dialog',
+      data: { query: this.searchQuery },
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.trim()) {
+        this.searchQuery = result;
+        this.search();
+      }
     });
   }
 

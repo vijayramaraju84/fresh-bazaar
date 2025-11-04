@@ -75,11 +75,11 @@
           </app-add-to-cart-button>
 
           <button mat-stroked-button class="wishlist-btn"
-                  [class.active]="product.wishlisted"
-                  (click)="toggleWishlist()">
-            <mat-icon>{{ product.wishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>
-            {{ product.wishlisted ? 'Wishlisted' : 'Add to Wishlist' }}
-          </button>
+                [class.active]="product.wishlisted"
+                (click)="toggleWishlist()">
+          <mat-icon>{{ product.wishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>
+          {{ product.wishlisted ? 'Wishlisted' : 'Add to Wishlist' }}
+        </button>
         </div>
       </div>
     </div>

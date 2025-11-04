@@ -1,3 +1,4 @@
+// src/app/app.component.ts
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './core/header/header.component';
@@ -5,7 +6,6 @@ import { FooterComponent } from './core/footer/footer.component';
 import { ToastComponent } from './features/toast/toast.component';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { AuthStateService } from './auth/auth-state.service';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { trigger, style, animate, transition } from '@angular/animations';
 
 @Component({
@@ -16,7 +16,6 @@ import { trigger, style, animate, transition } from '@angular/animations';
     HeaderComponent,
     FooterComponent,
     ToastComponent,
-    MatProgressSpinnerModule,
     AsyncPipe,
     CommonModule
   ],

@@ -1,4 +1,4 @@
-
+// src/app/features/products/add-to-cart-button/add-to-cart-button.component.ts
 import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, ContentChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,14 +13,13 @@ import { Product } from '../product.model';
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatIconModule],
   template: `
-    <!-- Project the product image here -->
     <ng-content select=".product-image"></ng-content>
 
     <button
       mat-raised-button
       color="primary"
       (click)="addToCart()"
-      [disabled]="adding"
+      [disabled]="adding || disabled"
       class="add-to-cart-btn"
       #buttonRef
     >
@@ -65,12 +64,6 @@ export class AddToCartButtonComponent implements AfterViewInit {
   @ViewChild('buttonRef') buttonRef!: ElementRef<HTMLElement>;
   @ContentChild('productImage', { static: false }) productImageRef!: ElementRef<HTMLImageElement>;
 
-  add(): void {
-    if (!this.disabled) {
-      this.added.emit();
-    }
-  }
-
   adding = false;
 
   constructor(
@@ -90,46 +83,39 @@ export class AddToCartButtonComponent implements AfterViewInit {
     });
   }
 
-  
-addToCart = async (): Promise<void> => {
-  if (this.adding || !this.product) return;
-  this.adding = true;
+  addToCart = async (): Promise<void> => {
+    if (this.adding || this.disabled || !this.product) return;
 
-  const item: CartItem = {
-    productId: this.product.id,
-    name: this.product.name,
-    price: this.product.price,
-    quantity: this.quantity
+    this.adding = true;
+
+    const requestItem: CartItem = {
+      productId: this.product.id,
+      productName: this.product.name,
+      productPrice: this.product.price,
+      quantity: this.quantity
+    };
+
+    const sourceElement = this.productImageRef?.nativeElement || this.buttonRef.nativeElement;
+
+    this.cartService.addToCart(requestItem).subscribe({
+      next: () => {
+        this.toastService.show(`${this.product.name} added to cart!`, 'success');
+        this.added.emit();
+        this.triggerFlyAnimation(sourceElement);
+      },
+      error: (err) => {
+        console.error('Add to cart failed:', err);
+        this.toastService.show('Failed to add item. Try again.', 'error');
+      }
+    });
+
+    setTimeout(() => this.adding = false, 3000);
   };
 
-  // Use image if available, otherwise button
-  const sourceElement = this.productImageRef?.nativeElement || this.buttonRef?.nativeElement;
-
-  // Always add to cart (don't wait for animation)
-  this.cartService.addToCart(item);
-  this.toastService.show(`${item.name} added to cart!`, 'success');
-  this.added.emit();
-
-  // Try animation, but NEVER block UI
-  if (sourceElement) {
-    try {
-      await flyToCart(sourceElement);
-      // Animation done → optional pulse
-    } catch (err) {
-      console.warn('Fly animation failed (non-critical):', err);
-    }
-  }
-
-  // ALWAYS reset spinner after 1 second max
-  setTimeout(() => {
-    this.adding = false;
-  }, 1000);
-
-}
-
-  private fallbackAddToCart(item: CartItem): void {
-    this.cartService.addToCart(item);
-    this.toastService.show(`${item.name} added to cart!`, 'success');
-    this.added.emit();
+  private triggerFlyAnimation(source: HTMLElement): void {
+    if (!source) return;
+    flyToCart(source).catch(err => {
+      console.warn('Fly animation failed (non-blocking):', err);
+    });
   }
 }

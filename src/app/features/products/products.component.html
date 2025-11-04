@@ -1,144 +1,175 @@
 <!-- src/app/features/products/products.component.html -->
-<div class="main-features" *ngIf="products.length > 0; else loading">
+<div class="products-page">
 
-  <!-- FEATURED SLIDER – ONLY SHOW WHEN NO SEARCH -->
-  <div class="slider-container" *ngIf="featuredProducts.length > 0 && !searchQuery">
-    <button mat-icon-button class="nav-btn prev" (click)="prevSlide()" aria-label="Previous slide">
-      <mat-icon>chevron_left</mat-icon>
-    </button>
-
-    <div class="slider">
-      <div class="slide"
-           *ngFor="let product of featuredProducts; let i = index"
-           [@slideAnimation]="i === currentSlideIndex ? 'active' : 'inactive'"
-           [class.active]="i === currentSlideIndex">
-        <img [src]="product.image" [alt]="product.name" class="slide-image" />
-        <div class="slide-content">
-          <h3>{{ product.name }}</h3>
-          <p *ngIf="product.offer" class="offer">{{ product.offer }}</p>
-          <p>₹{{ product.price }}</p>
-          <app-add-to-cart-button
-            [product]="product"
-            buttonText="Add to Cart"
-            (added)="onItemAdded()"
-            class="slider-add-btn">
-          </app-add-to-cart-button>
+  <!-- HERO BANNER -->
+  <div class="hero-banner" *ngIf="!searchQuery && featuredProducts.length">
+    <div class="hero-slider">
+      <div class="slide" *ngFor="let p of featuredProducts; let i = index"
+           [class.active]="i === currentSlide" @slide>
+        <img [src]="p.image" [alt]="p.name" class="hero-img" />
+        <div class="hero-content">
+          <h1>{{ p.name }}</h1>
+          <p class="offer" *ngIf="p.offer">{{ p.offer }}</p>
+          <p class="price">From ₹{{ p.price }}</p>
+          <button mat-raised-button color="accent" (click)="openDetail(p, $event)">
+            Shop Now
+          </button>
         </div>
       </div>
-    </div>
-
-    <button mat-icon-button class="nav-btn next" (click)="nextSlide()" aria-label="Next slide">
-      <mat-icon>chevron_right</mat-icon>
-    </button>
-  </div>
-
-  <!-- CATEGORIES -->
-  <div class="categories-section" *ngIf="categories.length > 0">
-    <h2>Explore Categories</h2>
-    <div class="categories-grid">
-      <a *ngFor="let category of categories"
-         [routerLink]="['/products']"
-         [queryParams]="{ category: category }"
-         class="category-card"
-         @cardAnimation>
-        <h3>{{ category }}</h3>
-      </a>
+      <button mat-icon-button class="nav prev" (click)="prev()" *ngIf="featuredProducts.length > 1">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-icon-button class="nav next" (click)="next()" *ngIf="featuredProducts.length > 1">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
     </div>
   </div>
 
-  <!-- PRODUCTS GRID – AMAZON STYLE -->
-  <div class="products-grid">
+  <!-- FILTER BAR -->
+  <div class="filter-bar" *ngIf="products.length">
+    <div class="filters">
+      <!-- Category -->
+      <button mat-stroked-button [matMenuTriggerFor]="categoryMenu" class="filter-btn">
+        <mat-icon>category</mat-icon>
+        {{ selectedCategory || 'All Categories' }}
+      </button>
+      <mat-menu #categoryMenu="matMenu">
+        <button mat-menu-item (click)="filterByCategory('')">All Categories</button>
+        <button mat-menu-item *ngFor="let cat of categories" (click)="filterByCategory(cat)">
+          {{ cat }}
+        </button>
+      </mat-menu>
+
+      <!-- Sort Menu -->
+      <button mat-stroked-button [matMenuTriggerFor]="sortMenu" class="filter-btn">
+        <mat-icon>sort</mat-icon>
+        {{ sortOptions[sortBy] }}
+      </button>
+      <mat-menu #sortMenu="matMenu">
+        <button mat-menu-item 
+                *ngFor="let opt of sortOptionKeys" 
+                (click)="sortBy = opt; currentPage = 0; applyFilters()">
+          {{ sortOptions[opt] }}
+        </button>
+      </mat-menu>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput 
+               [(ngModel)]="searchQuery" 
+               (input)="onSearch()" 
+               placeholder="Search products..." 
+               aria-label="Search products" />
+        <button mat-icon-button matSuffix *ngIf="searchQuery" (click)="clearSearch()">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- RESULTS COUNT -->
+  <p class="results-count" *ngIf="filteredProducts.length">
+    {{ filteredProducts.length }} products found
+  </p>
+
+  <!-- PRODUCTS GRID -->
+  <div class="products-grid" #grid>
     <div *ngFor="let product of filteredProducts; trackBy: trackById"
-         class="product-card"
-         (click)="openDetail(product)"
-         @cardAnimation>
+         class="product-card" 
+         (click)="openDetail(product, $event)"
+         [@cardEnter]>
 
-      <!-- Image Container -->
-      <div class="image-container">
-        <img [src]="product.image"
-             [alt]="product.name"
-             class="product-image"
-             loading="lazy" />
-
+      <!-- Image + Badges -->
+      <div class="img-wrapper">
+        <img [src]="product.image" [alt]="product.name" loading="lazy" />
+        
         <!-- Wishlist -->
-        <button mat-icon-button
-                class="wishlist-btn"
+        <button mat-icon-button class="wishlist" 
                 [class.active]="product.wishlisted"
-                (click)="toggleWishlist(product)"
+                (click)="toggleWishlist(product, $event)"
                 matTooltip="Add to wishlist"
                 aria-label="Wishlist">
           <mat-icon>{{ product.wishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>
         </button>
 
-        <!-- Sold Out -->
-        <div class="sold-out-overlay" *ngIf="product.stock === 0">
-          <span>Sold Out</span>
+        <!-- Prime -->
+        <div class="prime-badges" *ngIf="product.prime">
+          <span class="prime">Prime</span>
         </div>
+
+        <!-- Sold Out -->
+        <div class="sold-out" *ngIf="product.stock === 0">SOLD OUT</div>
       </div>
 
-      <!-- Content -->
-      <div class="product-content">
-        <h3 class="product-name" [matTooltip]="product.name">
-          {{ product.name }}
-        </h3>
+      <!-- Body -->
+      <div class="card-body">
+        <h3 class="title" [matTooltip]="product.name">{{ product.name }}</h3>
 
         <!-- Rating -->
         <div class="rating" *ngIf="product.rating">
-          <mat-icon *ngFor="let star of getStars(product.rating)" class="star">
-            {{ star }}
-          </mat-icon>
-          <span class="rating-count">({{ product.reviews || 0 }})</span>
+          <span class="stars">
+            <mat-icon *ngFor="let s of getStars(product.rating!)">{{ s }}</mat-icon>
+          </span>
+          <span class="count">({{ product.reviews ?? 0 }})</span>
         </div>
 
         <!-- Price -->
-        <div class="price-container">
-  <span class="price">₹{{ product.price }}</span>
-  <ng-container *ngIf="product.mrp != null && product.mrp > product.price">
-    <span class="mrp">₹{{ product.mrp }}</span>
-    <span class="discount">{{ getDiscountPercent(product) }}% off</span>
-  </ng-container>
-</div>
+        <div class="price-row">
+          <span class="current">₹{{ product.price }}</span>
+          <span class="original" *ngIf="product.mrp && product.mrp > product.price">
+            ₹{{ product.mrp }}
+          </span>
+          <span class="discount" *ngIf="product.mrp && product.mrp > product.price">
+            {{ getDiscount(product) }}% off
+          </span>
+        </div>
 
         <!-- Add to Cart -->
         <app-add-to-cart-button
           [product]="product"
-          buttonText="Add to Cart"
+          buttonText="Add"
           [disabled]="product.stock === 0"
-          (added)="onItemAdded()"
+          (click)="$event.stopPropagation()"
+          (added)="onAdd(product)"
           class="add-btn">
         </app-add-to-cart-button>
-
-        <!-- Prime -->
-        <div class="prime-badge" *ngIf="product.prime">
-          <mat-icon>local_shipping</mat-icon>
-          <span>Free Delivery</span>
-        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- SKELETON LOADING -->
-<ng-template #loading>
-  <div class="products-grid">
-    <div *ngFor="let _ of [].constructor(8)" class="product-card skeleton">
-      <div class="image-skeleton"></div>
-      <div class="content-skeleton">
+  <!-- LOAD MORE -->
+  <div class="load-more" #loadMore>
+    <mat-progress-spinner mode="indeterminate" diameter="40" *ngIf="loadingMore"></mat-progress-spinner>
+    <p *ngIf="!hasMore && filteredProducts.length">No more products</p>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" *ngIf="!loading && filteredProducts.length === 0">
+    <mat-icon>search_off</mat-icon>
+    <h3>No products found</h3>
+    <p>Try adjusting your filters or search term.</p>
+    <button mat-raised-button color="accent" (click)="resetFilters()">Clear Filters</button>
+  </div>
+
+  <!-- SKELETON -->
+  <div class="products-grid" *ngIf="loading">
+    <div *ngFor="let _ of skeletonItems" class="product-card skeleton">
+      <div class="img-skeleton"></div>
+      <div class="body-skeleton">
         <div class="line long"></div>
         <div class="line short"></div>
         <div class="line price"></div>
       </div>
     </div>
   </div>
-</ng-template>
+</div>
 
-<!-- At the end of products.component.html -->
 <app-product-detail
   *ngIf="selectedProduct"
-  [product]="selectedProduct!"
+  [product]="selectedProduct"
   (close)="closeDetail()"
-  (added)="onItemAdded()">
+  (added)="onAdd($event)">
 </app-product-detail>
-
-<!-- TOAST -->
-<app-toast></app-toast>

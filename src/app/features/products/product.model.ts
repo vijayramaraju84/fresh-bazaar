@@ -12,7 +12,7 @@ export interface Product {
   rating?: number;
   reviews?: number;
   prime?: boolean;
-  wishlisted?: boolean;
+  wishlisted: boolean;
   images?: string[];      
   features?: string[];
 }

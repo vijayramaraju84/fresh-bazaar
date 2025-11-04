@@ -1,94 +1,89 @@
+<!-- src/app/core/header/header.component.html -->
 <mat-toolbar class="header" role="toolbar">
   <!-- Logo -->
-  <span class="logo" role="button" tabindex="0" (click)="goHome()" (keyup.enter)="goHome()" 
+  <span class="logo" role="button" tabindex="0" (click)="goHome()" (keyup.enter)="goHome()"
         aria-label="Go to Fresh Bazaar home">
     Fresh Bazaar
   </span>
 
-  <!-- Search Box -->
-  <div class="search">
-    <input
-      matInput
-      [(ngModel)]="searchQuery"
-      placeholder="Search products..."
-      class="search-input"
-      (keyup.enter)="search()"
-      aria-label="Search products"
-    />
-    <button mat-icon-button class="search-btn" (click)="search()" 
-            matTooltip="Search" aria-label="Search">
+  <!-- Desktop: Full Search Bar -->
+  <div class="search desktop-only">
+    <input matInput [(ngModel)]="searchQuery" placeholder="Search products..."
+           class="search-input" (keyup.enter)="search()" aria-label="Search products"/>
+    <button mat-icon-button class="search-btn" (click)="search()" matTooltip="Search">
       <mat-icon>search</mat-icon>
     </button>
   </div>
 
-  <!-- Right Side Icons -->
-  <div class="user-menu">
-
-    <!-- User Menu -->
-    <button mat-icon-button [matMenuTriggerFor]="userMenu" 
-            class="icon-btn" matTooltip="Account" aria-label="Open user menu">
+  <!-- Desktop: Full Right Menu -->
+  <div class="user-menu desktop-only">
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" class="icon-btn" matTooltip="Account">
       <mat-icon>{{ user ? 'person' : 'login' }}</mat-icon>
     </button>
 
-    <mat-menu #userMenu="matMenu" xPosition="before" class="user-menu-dropdown">
-      <ng-container *ngIf="user; else loginTemplate">
-        <!-- User Info -->
-        <div class="profile-section" mat-menu-item disabled>
-          <div class="profile-info">
-            <mat-icon class="profile-icon">person</mat-icon>
-            <div>
-              <div class="profile-username">{{ user.username }}</div>
-              <div class="profile-role">{{ user.role || 'Customer' }}</div>
-            </div>
-          </div>
-        </div>
-        <mat-divider></mat-divider>
-
-        <!-- Menu Items -->
-        <button mat-menu-item routerLink="/orders">
-          <mat-icon>shopping_bag</mat-icon>
-          <span>My Orders</span>
-        </button>
-
-        <button mat-menu-item routerLink="/settings">
-          <mat-icon>settings</mat-icon>
-          <span>Settings</span>
-        </button>
-
-        <!-- Admin Only -->
-        <button *ngIf="user.role === 'ADMIN'" mat-menu-item routerLink="/admin/products/create">
-          <mat-icon>add_circle</mat-icon>
-          <span>Create Product</span>
-        </button>
-
-        <mat-divider></mat-divider>
-
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          <span>Logout</span>
-        </button>
-      </ng-container>
-
-      <ng-template #loginTemplate>
-        <button mat-menu-item routerLink="/login">
-          <mat-icon>login</mat-icon>
-          <span>Login</span>
-        </button>
-      </ng-template>
-    </mat-menu>
-
-    <!-- Cart with Badge -->
-    <button mat-icon-button routerLink="/cart" class="icon-btn cart-btn cart-icon"
-            matTooltip="View cart" [attr.aria-label]="'Cart with ' + cartItemCount + ' items'">
+    <button mat-icon-button routerLink="/cart" class="cart-icon" *ngIf="user">
       <mat-icon>shopping_cart</mat-icon>
       <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
     </button>
 
-    <!-- Categories -->
-    <button mat-icon-button routerLink="/categories" class="icon-btn"
-            matTooltip="Browse categories" aria-label="Categories">
+    <button mat-icon-button routerLink="/categories" class="icon-btn" matTooltip="Categories">
       <mat-icon>category</mat-icon>
     </button>
+  </div>
 
+  <!-- Mobile: Hamburger + Search Icon -->
+  <div class="mobile-controls mobile-only">
+    <!-- Search Icon (opens dialog) -->
+    <!-- Mobile: Search Icon -->
+<button mat-icon-button (click)="openSearchDialog()" class="icon-btn mobile-only" matTooltip="Search">
+  <mat-icon>search</mat-icon>
+</button>
+
+    <!-- Hamburger Menu -->
+    <button mat-icon-button [matMenuTriggerFor]="mobileMenu" class="icon-btn">
+      <mat-icon>menu</mat-icon>
+    </button>
   </div>
 </mat-toolbar>
+
+<!-- USER MENU (Shared) -->
+<mat-menu #userMenu="matMenu" xPosition="before" class="user-menu-dropdown">
+  <ng-container *ngIf="user; else loginTemplate">
+    <div class="profile-section" mat-menu-item disabled>
+      <div class="profile-info">
+        <mat-icon class="profile-icon">person</mat-icon>
+        <div>
+          <div class="profile-username">{{ user.username }}</div>
+          <div class="profile-role">{{ user.role || 'Customer' }}</div>
+        </div>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+    <button mat-menu-item routerLink="/orders"><mat-icon>shopping_bag</mat-icon> My Orders</button>
+    <button mat-menu-item routerLink="/settings"><mat-icon>settings</mat-icon> Settings</button>
+    <button *ngIf="user.role === 'ADMIN'" mat-menu-item routerLink="/admin/products/create">
+      <mat-icon>add_circle</mat-icon> Create Product
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Logout</button>
+  </ng-container>
+  <ng-template #loginTemplate>
+    <button mat-menu-item routerLink="/login"><mat-icon>login</mat-icon> Login</button>
+  </ng-template>
+</mat-menu>
+
+<!-- MOBILE MENU -->
+<mat-menu #mobileMenu="matMenu" class="mobile-menu">
+  <button mat-menu-item routerLink="/cart" *ngIf="user">
+    <mat-icon>shopping_cart</mat-icon>
+    <span>Cart <span class="cart-badge-inline" *ngIf="cartItemCount > 0">({{ cartItemCount }})</span></span>
+  </button>
+  <button mat-menu-item routerLink="/categories">
+    <mat-icon>category</mat-icon> Categories
+  </button>
+  <mat-divider></mat-divider>
+  <button mat-menu-item [matMenuTriggerFor]="userMenu">
+    <mat-icon>{{ user ? 'person' : 'login' }}</mat-icon>
+    {{ user ? 'Account' : 'Login' }}
+  </button>
+</mat-menu>
