@@ -1,5 +1,7 @@
+<!-- src/app/features/checkout/checkout.component.html -->
 <div class="checkout-container">
   <h2>Checkout</h2>
+
   <div class="order-summary">
     <h3>Order Summary</h3>
     <div class="cart-items">
@@ -18,41 +20,66 @@
   <div class="checkout-form">
     <h3>Shipping Address</h3>
     <div *ngIf="error" class="error" role="alert" aria-live="assertive">{{ error }}</div>
+
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Name</mat-label>
-      <input matInput [(ngModel)]="shippingAddress.name"  aria-label="Name (auto-filled from profile)">
+      <input matInput [(ngModel)]="shippingAddress.name" required aria-label="Full name">
     </mat-form-field>
+
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Phone Number</mat-label>
-      <input matInput [(ngModel)]="shippingAddress.phoneNumber" placeholder="Enter 10-digit phone number" aria-label="Phone number">
+      <input matInput [(ngModel)]="shippingAddress.phoneNumber" required aria-label="10-digit phone number">
     </mat-form-field>
+
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Email</mat-label>
-      <input matInput [(ngModel)]="shippingAddress.email" placeholder="Enter email address (e.g., user@example.com)" aria-label="Email address">
+      <input matInput [(ngModel)]="shippingAddress.email" type="email" required aria-label="Email address">
     </mat-form-field>
+
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Address</mat-label>
-      <textarea matInput [(ngModel)]="shippingAddress.address" placeholder="Enter shipping address" aria-label="Shipping address"></textarea>
+      <mat-label>Address Line</mat-label>
+      <textarea matInput [(ngModel)]="shippingAddress.addressLine" rows="2" required aria-label="Street address"></textarea>
     </mat-form-field>
-    <mat-checkbox [(ngModel)]="shippingAddress.isImportant" aria-label="Mark as important">Mark as Important</mat-checkbox>
+
+    <div class="row">
+      <mat-form-field appearance="fill" class="half-width">
+        <mat-label>City</mat-label>
+        <input matInput [(ngModel)]="shippingAddress.city" required>
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="half-width">
+        <mat-label>State</mat-label>
+        <input matInput [(ngModel)]="shippingAddress.state" required>
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field appearance="fill" class="half-width">
+        <mat-label>Pin Code</mat-label>
+        <input matInput [(ngModel)]="shippingAddress.pinCode" required>
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="half-width">
+        <mat-label>Country</mat-label>
+        <input matInput [(ngModel)]="shippingAddress.country" value="India" disabled>
+      </mat-form-field>
+    </div>
 
     <h3>Payment Method</h3>
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Payment Method</mat-label>
-      <mat-select [(ngModel)]="paymentMethod" aria-label="Select payment method">
-        <mat-option value="credit_card">Credit Card</mat-option>
-        <mat-option value="debit_card">Debit Card</mat-option>
-        <mat-option value="upi">UPI</mat-option>
-        <mat-option value="cash_on_delivery">Cash on Delivery</mat-option>
+      <mat-label>Select Payment</mat-label>
+      <mat-select [(ngModel)]="paymentMethod" required>
+        <mat-option value="UPI">UPI</mat-option>
+        <mat-option value="CREDIT_CARD">Credit Card</mat-option>
+        <mat-option value="DEBIT_CARD">Debit Card</mat-option>
+        <mat-option value="CASH_ON_DELIVERY">Cash on Delivery</mat-option>
       </mat-select>
     </mat-form-field>
 
     <div class="actions">
-      <button mat-raised-button color="primary" (click)="confirmOrder()" [disabled]="loading" aria-label="Confirm order">
-        <span *ngIf="!loading">Confirm Order</span>
+      <button mat-raised-button color="primary" (click)="confirmOrder()" [disabled]="loading || !isFormValid()" aria-label="Place order">
+        <span *ngIf="!loading">Place Order</span>
         <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
       </button>
-      <button mat-raised-button color="warn" routerLink="/cart" [disabled]="loading" aria-label="Back to cart">
+      <button mat-stroked-button routerLink="/cart" [disabled]="loading">
         Back to Cart
       </button>
     </div>

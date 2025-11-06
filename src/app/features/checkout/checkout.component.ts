@@ -6,28 +6,22 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { CartService, CartItem } from '../cart/cart.service';
-import { AuthService, User } from '../../auth/auth.service';
+import { AuthService } from '../../auth/auth.service';
 
 interface ShippingAddress {
   name: string;
   phoneNumber: string;
   email: string;
-  address: string;
-  isImportant: boolean;
-}
-
-interface Order {
-  orderId: number;
-  items: CartItem[];
-  totalPrice: number;
-  shippingAddress: ShippingAddress;
-  paymentMethod: string;
-  createdAt: string;
+  addressLine: string;
+  city: string;
+  state: string;
+  pinCode: string;
+  country: string;
 }
 
 @Component({
@@ -40,7 +34,6 @@ interface Order {
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatCheckboxModule,
     MatProgressSpinnerModule
   ],
   templateUrl: './checkout.component.html',
@@ -53,17 +46,23 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     name: '',
     phoneNumber: '',
     email: '',
-    address: '',
-    isImportant: false
+    addressLine: '',
+    city: '',
+    state: '',
+    pinCode: '',
+    country: 'India'
   };
-  paymentMethod = 'COD';
+  paymentMethod = 'UPI'; // ← Match backend: "UPI"
   error = '';
   loading = false;
   private subs = new Subscription();
 
+  private apiUrl = 'https://cart-service-tabj.onrender.com/cart';
+
   constructor(
     private cartService: CartService,
     private authService: AuthService,
+    private http: HttpClient,
     private router: Router
   ) {}
 
@@ -84,7 +83,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.subs.add(
       this.cartService.getCartItems().subscribe({
-        next: (items: CartItem[]) => {
+        next: (items) => {
           this.cartItems = items;
           this.calculateTotal();
           this.loading = false;
@@ -100,59 +99,77 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   private loadUserProfile(): void {
     this.subs.add(
       this.authService.getProfile().subscribe({
-        next: (user: User) => {
+        next: (user) => {
           this.shippingAddress.name = user.username || '';
           this.shippingAddress.email = user.email || '';
-        },
-        error: (err) => {
-          console.error('Profile load failed:', err);
         }
       })
     );
   }
 
   calculateTotal(): void {
-    this.totalPrice = this.cartItems.reduce((sum: number, item: CartItem) => sum + item.productPrice * item.quantity, 0);
+    this.totalPrice = this.cartItems.reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
   }
 
-  confirmOrder(): void {
-    this.error = '';
-    this.loading = true;
+  isFormValid(): boolean {
+    const { name, phoneNumber, email, addressLine, city, state, pinCode } = this.shippingAddress;
+    return !!(
+      name.trim() &&
+      /^\d{10}$/.test(phoneNumber) &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
+      addressLine.trim() &&
+      city.trim() &&
+      state.trim() &&
+      /^\d{6}$/.test(pinCode)
+    );
+  }
 
-    const { name, phoneNumber, email, address } = this.shippingAddress;
-    if (!name.trim() || !phoneNumber.trim() || !email.trim() || !address.trim()) {
-      this.error = 'All fields are required.';
-      this.loading = false;
-      return;
-    }
-    if (!/^\d{10}$/.test(phoneNumber)) {
-      this.error = 'Phone must be 10 digits.';
-      this.loading = false;
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      this.error = 'Invalid email.';
-      this.loading = false;
-      return;
-    }
+  // src/app/features/checkout/checkout.component.ts (only confirmOrder method updated)
 
-    // Simulate order creation (no backend)
-    const order: Order = {
-      orderId: Date.now(),
-      items: [...this.cartItems],
-      totalPrice: this.totalPrice,
-      shippingAddress: { ...this.shippingAddress },
-      paymentMethod: this.paymentMethod,
-      createdAt: new Date().toISOString()
-    };
+confirmOrder(): void {
+  this.error = '';
+  this.loading = true;
 
-    // Save to localStorage
-    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    orders.push(order);
-    localStorage.setItem('orders', JSON.stringify(orders));
-
-    this.cartService.clearCart();
+  if (!this.isFormValid()) {
+    this.error = 'Please fill all fields correctly.';
     this.loading = false;
-    this.router.navigate(['/order-confirmation'], { state: { order } });
+    return;
+  }
+
+  const payload = {
+    name: this.shippingAddress.name,
+    phoneNumber: this.shippingAddress.phoneNumber,
+    email: this.shippingAddress.email,
+    addressLine: this.shippingAddress.addressLine,
+    city: this.shippingAddress.city,
+    state: this.shippingAddress.state,
+    pinCode: this.shippingAddress.pinCode,
+    country: this.shippingAddress.country,
+    paymentMethod: this.paymentMethod.toUpperCase()
+  };
+
+  const headers = this.getAuthHeaders();
+
+  this.http.post<any>(`${this.apiUrl}/orders/place`, payload, { headers })
+    .subscribe({
+      next: (res) => {
+        // PASS FULL RESPONSE TO CONFIRMATION
+        this.router.navigate(['/order-confirmation'], {
+          state: { orderData: res } // ← Use state, not queryParams
+        });
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'Order failed. Try again.';
+        this.loading = false;
+      }
+    });
+}
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
   }
 }

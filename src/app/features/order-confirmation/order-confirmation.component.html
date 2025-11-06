@@ -1,41 +1,41 @@
-
+<!-- src/app/features/order-confirmation/order-confirmation.component.html -->
 <div class="confirmation-container" *ngIf="order; else noOrder">
   <h2>Order Confirmation</h2>
-  <h3>Thank you for your order!</h3>
+  <h3>Thank you, {{ order.name }}!</h3>
+
   <div class="order-details">
     <p><strong>Order ID:</strong> {{ order.orderId }}</p>
     <p><strong>Placed on:</strong> {{ order.createdAt | date:'medium' }}</p>
+    <p><strong>Status:</strong> <span class="status">{{ order.status }}</span></p>
+
     <h4>Shipping Address</h4>
-    <p><strong>Name:</strong> {{ order.shippingAddress.name }}</p>
-    <p><strong>Phone Number:</strong> {{ order.shippingAddress.phoneNumber }}</p>
-    <p><strong>Email:</strong> {{ order.shippingAddress.email }}</p>
-    <p><strong>Address:</strong> {{ order.shippingAddress.address }}</p>
-    <p><strong>Important:</strong> {{ order.shippingAddress.isImportant ? 'Yes' : 'No' }}</p>
-    <p><strong>Payment Method:</strong> {{ formatPaymentMethod(order.paymentMethod) }}</p>
+    <p>{{ order.name }}</p>
+    <p>{{ order.phoneNumber }}</p>
+    <p *ngIf="order.emailId">{{ order.emailId }}</p>
+    <p>{{ order.addressLine }}, {{ order.city }}, {{ order.state }} {{ order.pinCode }}</p>
+    <p><strong>Payment:</strong> {{ order.paymentMethod }}</p>
   </div>
+
   <div class="order-items">
-    <h3>Items</h3>
+    <h3>Items ({{ order.itemCount }})</h3>
     <div class="cart-item" *ngFor="let item of order.items">
-      <div class="item-details">
-        <h4>{{ item.name }}</h4>
-        <p>Price: ₹{{ item.price | number:'1.2-2' }}</p>
-        <p>Quantity: {{ item.quantity }}</p>
-        <p>Subtotal: ₹{{ (item.price * item.quantity) | number:'1.2-2' }}</p>
-      </div>
+      <h4>{{ item.productName }}</h4>
+      <p>₹{{ formatPrice(item.price) }} × {{ item.quantity }} = ₹{{ formatPrice(item.totalPrice) }}</p>
     </div>
   </div>
-  <h3>Total: ₹{{ getTotalPrice() | number:'1.2-2' }}</h3>
-  <button mat-raised-button color="primary" routerLink="/products" aria-label="Continue shopping">
-    Continue Shopping
-  </button>
+
+  <h3 class="total">Total: ₹{{ formatPrice(order.totalAmount) }}</h3>
+
+  <div class="actions">
+    <button mat-raised-button color="primary" (click)="goHome()">
+      Continue Shopping
+    </button>
+  </div>
 </div>
 
 <ng-template #noOrder>
   <div class="no-order">
     <h2>No Order Found</h2>
-    <p>Please complete the checkout process to view order details.</p>
-    <button mat-raised-button color="primary" routerLink="/cart" aria-label="Back to cart">
-      Back to Cart
-    </button>
+    <button mat-raised-button color="primary" routerLink="/cart">Back to Cart</button>
   </div>
 </ng-template>

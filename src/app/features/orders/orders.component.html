@@ -1,0 +1,68 @@
+<!-- src/app/features/orders/orders.component.html -->
+<div class="orders-container">
+  <h2>My Orders</h2>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <mat-progress-spinner diameter="40"></mat-progress-spinner>
+    <p>Loading orders...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error" *ngIf="!loading && error">
+    <mat-icon>error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-button (click)="loadOrders()">Retry</button>
+  </div>
+
+  <!-- Orders List -->
+  <div class="orders-list" *ngIf="!loading && !error && orders.length === 0">
+    <mat-icon class="empty-icon">shopping_bag</mat-icon>
+    <h3>No Orders Yet</h3>
+    <p>Your shopping journey starts here!</p>
+    <button mat-raised-button color="accent" routerLink="/products">
+      Start Shopping
+    </button>
+  </div>
+
+  <div class="orders-grid" *ngIf="!loading && !error && orders.length > 0">
+    <div class="order-card" *ngFor="let order of filteredOrders; trackBy: trackByOrderId">
+      <div class="order-header">
+        <div class="order-info">
+          <h3>Order #{{ order.orderId }}</h3>
+          <p class="date">{{ order.createdAt | date:'medium' }}</p>
+          <p class="items">{{ order.itemCount }} item{{ order.itemCount !== 1 ? 's' : '' }}</p>
+        </div>
+        <div class="order-status" [ngStyle]="{'background-color': getStatusColor(order.status)}">
+          {{ getStatusText(order.status) }}
+        </div>
+      </div>
+
+      <div class="order-items">
+        <div class="item" *ngFor="let item of order.items">
+          <div class="item-details">
+            <h4>{{ item.productName }}</h4>
+            <p>Qty: {{ item.quantity }} × ₹{{ formatPrice(item.price) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-footer">
+        <div class="total">
+          <strong>Total: ₹{{ formatPrice(order.totalAmount) }}</strong>
+        </div>
+        <button mat-stroked-button class="view-details" (click)="viewOrderDetails(order)">
+          View Details
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-section" *ngIf="orders.length > 0">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Search orders..." />
+    </mat-form-field>
+  </div>
+</div>

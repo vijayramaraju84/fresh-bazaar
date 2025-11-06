@@ -8,6 +8,7 @@ import { OrderConfirmationComponent } from './features/order-confirmation/order-
 import { AdminProductCreateComponent } from './features/products/AdminProductCreate/admin-product-create.component';
 import { AuthGuard } from './auth/auth.guard';
 import { ReverseAuthGuard } from './auth/reverse-auth.guard';
+import { OrdersComponent } from './features/orders/orders.component';
 
 export const routes: Routes = [
   // === PUBLIC ROUTES (no login needed) ===
@@ -25,7 +26,9 @@ export const routes: Routes = [
         path: 'login',
         component: LoginComponent,
         canActivate: [ReverseAuthGuard]
-      }
+      },
+
+      { path: 'orders', component: OrdersComponent, canActivate: [AuthGuard] }
     ]
   },
 
