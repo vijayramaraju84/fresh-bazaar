@@ -165,3 +165,6 @@
   border-radius: 16px !important;
   overflow: hidden;
 }
+/* header.component.css */
+.mobile-controls { display: none !important; } /* Remove hamburger */
+.mobile-menu { display: none !important; } /* Remove mobile menu */

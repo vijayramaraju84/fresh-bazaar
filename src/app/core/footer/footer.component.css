@@ -222,3 +222,14 @@
     font-size: 1.4rem;
   }
 }
+
+
+.footer {
+  margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .footer {
+    display: none !important;
+  }
+}

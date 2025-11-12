@@ -1,4 +1,3 @@
-<!-- src/app/features/products/products.component.html -->
 <div class="products-page">
 
   <!-- HERO BANNER -->
@@ -53,21 +52,6 @@
         </button>
       </mat-menu>
     </div>
-
-    <!-- Search -->
-    <!-- <div class="search-box">
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-icon matPrefix>search</mat-icon>
-        <input matInput 
-               [(ngModel)]="searchQuery" 
-               (input)="onSearch()" 
-               placeholder="Search products..." 
-               aria-label="Search products" />
-        <button mat-icon-button matSuffix *ngIf="searchQuery" (click)="clearSearch()">
-          <mat-icon>clear</mat-icon>
-        </button>
-      </mat-form-field>
-    </div> -->
   </div>
 
   <!-- RESULTS COUNT -->
@@ -127,15 +111,16 @@
           </span>
         </div>
 
-        <!-- Add to Cart -->
-        <app-add-to-cart-button
-          [product]="product"
-          buttonText="Add"
-          [disabled]="product.stock === 0"
-          (click)="$event.stopPropagation()"
-          (added)="onAdd(product)"
-          class="add-btn">
-        </app-add-to-cart-button>
+        <!-- Add to Cart Button -->
+        <div class="actions">
+          <app-add-to-cart-button
+            [product]="product"
+            buttonText="Add"
+            [disabled]="product.stock === 0"
+            (click)="$event.stopPropagation()"
+            (quantityChange)="onQuantityChange(product, $event)"
+            class="add-btn">
+          </app-add-to-cart-button>
       </div>
     </div>
   </div>
@@ -167,6 +152,7 @@
   </div>
 </div>
 
+<!-- PRODUCT DETAIL MODAL -->
 <app-product-detail
   *ngIf="selectedProduct"
   [product]="selectedProduct"

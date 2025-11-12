@@ -7,6 +7,7 @@ import { ToastComponent } from './features/toast/toast.component';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { AuthStateService } from './auth/auth-state.service';
 import { trigger, style, animate, transition } from '@angular/animations';
+import { MobileFooterNavComponent } from "./core/footer/mobile-footer-nav.component";
 
 @Component({
   selector: 'app-root',
@@ -17,8 +18,9 @@ import { trigger, style, animate, transition } from '@angular/animations';
     FooterComponent,
     ToastComponent,
     AsyncPipe,
-    CommonModule
-  ],
+    CommonModule,
+    MobileFooterNavComponent
+],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   animations: [

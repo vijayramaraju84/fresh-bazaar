@@ -13,6 +13,7 @@ export interface Product {
   reviews?: number;
   prime?: boolean;
   wishlisted: boolean;
-  images?: string[];      
+  images?: string[];
   features?: string[];
+  cartQuantity: number;
 }

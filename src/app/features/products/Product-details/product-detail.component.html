@@ -68,9 +68,10 @@
         <div class="actions">
           <app-add-to-cart-button
             [product]="product"
-            buttonText="Add to Cart"
+            buttonText="Add"
             [disabled]="product.stock === 0"
-            (added)="onAdded()"
+            (click)="$event.stopPropagation()"
+            (quantityChange)="onQuantityChange(product, $event)"
             class="add-btn">
           </app-add-to-cart-button>
 

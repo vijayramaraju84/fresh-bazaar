@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,28 +10,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { CartService } from '../cart/cart.service';
+import { Subscription, firstValueFrom } from 'rxjs';
+import { CartService, CartItem } from '../cart/cart.service';
 import { ProductService } from '../products/product.service';
 import { AddToCartButtonComponent } from '../products/add-to-cart-button/add-to-cart-button.component';
 import { ProductDetailComponent } from './Product-details/product-detail.component';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category?: string;
-  description?: string;
-  stock: number;
-  rating?: number;
-  reviews?: number;
-  prime?: boolean;
-  mrp?: number;
-  offer?: string;
-  wishlisted: boolean;
-}
-
+import { Product } from './product.model';
 
 @Component({
   selector: 'app-products',
@@ -69,21 +53,20 @@ export class ProductsComponent implements OnInit, OnDestroy, AfterViewInit {
   filteredProducts: Product[] = [];
   featuredProducts: Product[] = [];
   categories: string[] = [];
-
   searchQuery = '';
   selectedCategory = '';
   sortBy: 'featured' | 'priceLow' | 'priceHigh' | 'rating' | 'newest' = 'featured';
 
-readonly sortOptions = {
-  featured: 'Featured',
-  priceLow: 'Price: Low to High',
-  priceHigh: 'Price: High to Low',
-  rating: 'Highest Rated',
-  newest: 'Newest First'
-} as const;
+  readonly sortOptions = {
+    featured: 'Featured',
+    priceLow: 'Price: Low to High',
+    priceHigh: 'Price: High to Low',
+    rating: 'Highest Rated',
+    newest: 'Newest First'
+  } as const;
 
   get sortOptionKeys(): (keyof typeof this.sortOptions)[] {
-  return Object.keys(this.sortOptions) as (keyof typeof this.sortOptions)[];
+    return Object.keys(this.sortOptions) as (keyof typeof this.sortOptions)[];
   }
 
   currentSlide = 0;
@@ -92,7 +75,6 @@ readonly sortOptions = {
   hasMore = true;
   pageSize = 12;
   currentPage = 0;
-
   skeletonItems = Array(8);
   private subs = new Subscription();
   private autoSlide!: any;
@@ -100,10 +82,31 @@ readonly sortOptions = {
   constructor(
     private route: ActivatedRoute,
     private cartService: CartService,
-    private productService: ProductService
+    private productService: ProductService,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    // 1. SUBSCRIBE TO CART
+    this.subs.add(
+      this.cartService.cartItems$.subscribe(cartItems => {
+        const cartMap = new Map(cartItems.map(i => [i.productId, i.quantity]));
+        this.products.forEach(p => p.cartQuantity = cartMap.get(p.id) || 0);
+        this.featuredProducts.forEach(p => p.cartQuantity = cartMap.get(p.id) || 0);
+        this.filteredProducts = [...this.filteredProducts];
+        this.cdr.detectChanges();
+      })
+    );
+
+    // 2. LOAD CART FIRST
+    if (localStorage.getItem('token')) {
+      await firstValueFrom(this.cartService.getCartItems());
+    } else {
+      this.cartService.loadGuestCart();
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+
+    // 3. LOAD PRODUCTS
     this.loadInitialData();
     this.setupAutoSlide();
     this.watchQueryParams();
@@ -125,8 +128,19 @@ readonly sortOptions = {
         this.products = this.normalizeProducts(data || []);
         this.categories = this.getUniqueCategories();
         this.featuredProducts = this.getFeatured();
+
+        // CRITICAL: SYNC CART AFTER PRODUCTS
+        const cartItems = localStorage.getItem('token')
+          ? this.cartService['cartItemsSubject'].value  // direct access
+          : this.cartService['guestCart'];
+
+        const cartMap = new Map(cartItems.map((i: CartItem) => [i.productId, i.quantity]));
+        this.products.forEach(p => p.cartQuantity = cartMap.get(p.id) || 0);
+        this.featuredProducts.forEach(p => p.cartQuantity = cartMap.get(p.id) || 0);
+
         this.applyFilters();
         this.loading = false;
+        this.cdr.detectChanges();  // FORCE UI UPDATE
       },
       error: () => this.loading = false
     });
@@ -146,7 +160,8 @@ readonly sortOptions = {
       prime: p.prime ?? Math.random() > 0.7,
       mrp: p.mrp ?? Math.round((p.price || 0) * 1.3),
       offer: p.offer ?? (Math.random() > 0.8 ? 'Limited Time Deal' : undefined),
-      wishlisted: p.wishlisted ?? false
+      wishlisted: p.wishlisted ?? false,
+      cartQuantity: 0
     }));
   }
 
@@ -160,44 +175,41 @@ readonly sortOptions = {
     );
   }
 
+  onQuantityChange(product: Product, newQty: number): void {
+    product.cartQuantity = newQty;
+  }
+
   private getFeatured(): Product[] {
     const withOffer = this.products.filter(p => !!p.offer);
     return withOffer.length ? withOffer.slice(0, 5) : this.products.slice(0, 5);
   }
 
   public applyFilters(): void {
-  let filtered = [...this.products];
-
-  // Search
-  if (this.searchQuery.trim()) {
-    const q = this.searchQuery.toLowerCase();
-    filtered = filtered.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.description?.toLowerCase().includes(q) ||
-      p.category?.toLowerCase().includes(q)
-    );
+    let filtered = [...this.products];
+    if (this.searchQuery.trim()) {
+      const q = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q)
+      );
+    }
+    if (this.selectedCategory) {
+      filtered = filtered.filter(p => p.category === this.selectedCategory);
+    }
+    filtered.sort((a, b) => {
+      switch (this.sortBy) {
+        case 'priceLow': return a.price - b.price;
+        case 'priceHigh': return b.price - a.price;
+        case 'rating': return (b.rating ?? 0) - (a.rating ?? 0);
+        case 'newest': return b.id - a.id;
+        default: return 0;
+      }
+    });
+    const total = filtered.length;
+    this.hasMore = total > this.pageSize * (this.currentPage + 1);
+    this.filteredProducts = filtered.slice(0, this.pageSize * (this.currentPage + 1));
   }
-
-  // Category
-  if (this.selectedCategory) {
-    filtered = filtered.filter(p => p.category === this.selectedCategory);
-  }
-
-  // SORT – NOW WORKS
-  filtered.sort((a, b) => {
-  switch (this.sortBy) {
-    case 'priceLow': return a.price - b.price;
-    case 'priceHigh': return b.price - a.price;
-    case 'rating': return (b.rating ?? 0) - (a.rating ?? 0);
-    case 'newest': return b.id - a.id;
-    default: return 0;
-  }
-});
-
-  const total = filtered.length;
-  this.hasMore = total > this.pageSize * (this.currentPage + 1);
-  this.filteredProducts = filtered.slice(0, this.pageSize * (this.currentPage + 1));
-}
 
   onSearch(): void {
     this.currentPage = 0;
@@ -269,15 +281,6 @@ readonly sortOptions = {
     }, 600);
   }
 
-  onAdd(product: Product): void {
-  this.cartService.addToCart({
-    productId: product.id,
-    productName: product.name,
-    productPrice: product.price,
-    quantity: 1
-  });
-}
-
   toggleWishlist(product: Product, event: Event): void {
     event.stopPropagation();
     product.wishlisted = !product.wishlisted;
@@ -307,7 +310,21 @@ readonly sortOptions = {
     event?.stopPropagation();
     this.selectedProduct = product;
   }
+
   closeDetail(): void {
     this.selectedProduct = null;
+  }
+
+  onAdd(product: Product): void {
+    product.cartQuantity = (product.cartQuantity || 0) + 1;
+
+    const item: CartItem = {
+      productId: product.id,
+      productName: product.name,
+      productPrice: product.price,
+      quantity: 1
+    };
+
+    this.cartService.addToCart(item).subscribe();
   }
 }

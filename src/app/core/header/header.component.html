@@ -1,52 +1,69 @@
 <!-- src/app/core/header/header.component.html -->
 <mat-toolbar class="header" role="toolbar">
-  <!-- Logo -->
-  <span class="logo" role="button" tabindex="0" (click)="goHome()" (keyup.enter)="goHome()"
-        aria-label="Go to Fresh Bazaar home">
+  <!-- LOGO (Always visible) -->
+  <span 
+    class="logo" 
+    role="button" 
+    tabindex="0" 
+    (click)="goHome()" 
+    (keyup.enter)="goHome()"
+    aria-label="Go to Fresh Bazaar home">
     Fresh Bazaar
   </span>
 
-  <!-- Desktop: Full Search Bar -->
+  <!-- MOBILE: Search Icon -->
+  <button 
+    mat-icon-button 
+    (click)="openSearchDialog()" 
+    class="icon-btn mobile-only" 
+    matTooltip="Search">
+    <mat-icon>search</mat-icon>
+  </button>
+
+  <!-- DESKTOP: Full Search Bar -->
   <div class="search desktop-only">
-    <input matInput [(ngModel)]="searchQuery" placeholder="Search products..."
-           class="search-input" (keyup.enter)="search()" aria-label="Search products"/>
+    <input 
+      matInput 
+      [(ngModel)]="searchQuery" 
+      placeholder="Search products..."
+      class="search-input" 
+      (keyup.enter)="search()" 
+      aria-label="Search products"/>
     <button mat-icon-button class="search-btn" (click)="search()" matTooltip="Search">
       <mat-icon>search</mat-icon>
     </button>
   </div>
 
-  <!-- Desktop: Full Right Menu -->
+  <!-- DESKTOP: Right Menu (Cart, Login, Categories) -->
   <div class="user-menu desktop-only">
-    <button mat-icon-button [matMenuTriggerFor]="userMenu" class="icon-btn" matTooltip="Account">
+    <button 
+      mat-icon-button 
+      [matMenuTriggerFor]="userMenu" 
+      class="icon-btn" 
+      matTooltip="Account">
       <mat-icon>{{ user ? 'person' : 'login' }}</mat-icon>
     </button>
-
-    <button mat-icon-button routerLink="/cart" class="cart-icon" *ngIf="user">
+    <button 
+      mat-icon-button 
+      routerLink="/cart" 
+      class="cart-icon" 
+      *ngIf="user">
       <mat-icon>shopping_cart</mat-icon>
       <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
     </button>
-
-    <button mat-icon-button routerLink="/categories" class="icon-btn" matTooltip="Categories">
+    <button 
+      mat-icon-button 
+      routerLink="/categories" 
+      class="icon-btn" 
+      matTooltip="Categories">
       <mat-icon>category</mat-icon>
     </button>
   </div>
 
-  <!-- Mobile: Hamburger + Search Icon -->
-  <div class="mobile-controls mobile-only">
-    <!-- Search Icon (opens dialog) -->
-    <!-- Mobile: Search Icon -->
-<button mat-icon-button (click)="openSearchDialog()" class="icon-btn mobile-only" matTooltip="Search">
-  <mat-icon>search</mat-icon>
-</button>
-
-    <!-- Hamburger Menu -->
-    <button mat-icon-button [matMenuTriggerFor]="mobileMenu" class="icon-btn">
-      <mat-icon>menu</mat-icon>
-    </button>
-  </div>
+  <!-- MOBILE: Hamburger (REMOVED — moved to footer) -->
 </mat-toolbar>
 
-<!-- USER MENU (Shared) -->
+<!-- USER MENU (Desktop Only) -->
 <mat-menu #userMenu="matMenu" xPosition="before" class="user-menu-dropdown">
   <ng-container *ngIf="user; else loginTemplate">
     <div class="profile-section" mat-menu-item disabled>
@@ -70,20 +87,4 @@
   <ng-template #loginTemplate>
     <button mat-menu-item routerLink="/login"><mat-icon>login</mat-icon> Login</button>
   </ng-template>
-</mat-menu>
-
-<!-- MOBILE MENU -->
-<mat-menu #mobileMenu="matMenu" class="mobile-menu">
-  <button mat-menu-item routerLink="/cart" *ngIf="user">
-    <mat-icon>shopping_cart</mat-icon>
-    <span>Cart <span class="cart-badge-inline" *ngIf="cartItemCount > 0">({{ cartItemCount }})</span></span>
-  </button>
-  <button mat-menu-item routerLink="/categories">
-    <mat-icon>category</mat-icon> Categories
-  </button>
-  <mat-divider></mat-divider>
-  <button mat-menu-item [matMenuTriggerFor]="userMenu">
-    <mat-icon>{{ user ? 'person' : 'login' }}</mat-icon>
-    {{ user ? 'Account' : 'Login' }}
-  </button>
 </mat-menu>

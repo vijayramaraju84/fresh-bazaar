@@ -11,7 +11,7 @@
     <h4>Shipping Address</h4>
     <p>{{ order.name }}</p>
     <p>{{ order.phoneNumber }}</p>
-    <p *ngIf="order.emailId">{{ order.emailId }}</p>
+    <p *ngIf="order.email">{{ order.email }}</p>
     <p>{{ order.addressLine }}, {{ order.city }}, {{ order.state }} {{ order.pinCode }}</p>
     <p><strong>Payment:</strong> {{ order.paymentMethod }}</p>
   </div>

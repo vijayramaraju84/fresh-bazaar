@@ -12,9 +12,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { AuthStateService } from '../../auth/auth-state.service';
+import { AuthService, User } from '../../auth/auth.service';
 import { CartService } from '../../features/cart/cart.service';
-import { User } from '../../auth/auth.service';
 import { SearchDialogComponent } from './search-dialog.component';
 
 @Component({
@@ -45,27 +44,38 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild('mobileSearchInput', { static: false }) mobileSearchInput?: ElementRef<HTMLInputElement>;
 
   constructor(
-    private authState: AuthStateService,
+    private authService: AuthService,     // ← Updated
     private cartService: CartService,
     private router: Router,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
+    // USER: From AuthService (cached or fresh)
+    this.user = this.authService.getCurrentUser();
+    if (this.authService.isLoggedIn() && !this.user) {
+      this.authService.getProfile().subscribe({
+        next: (u) => this.user = u,
+        error: () => this.user = null
+      });
+    }
+
+    // CART COUNT: Works for Guest & Logged In
     this.subs.add(
-      this.authState.getUser$().subscribe(user => this.user = user)
+      this.cartService.getCartCountObservable().subscribe(count => {
+        this.cartItemCount = count;
+      })
     );
 
+    // PULSE ANIMATION ON ADD
     this.subs.add(
-      this.cartService.getCartCountObservable().subscribe(count => this.cartItemCount = count)
-    );
-
-    this.subs.add(
-      this.cartService.itemAdded$.subscribe(() => {
-        const btn = document.querySelector('.cart-icon') as HTMLElement;
-        if (btn) {
-          btn.classList.add('pulse');
-          setTimeout(() => btn.classList.remove('pulse'), 600);
+      this.cartService.itemAdded$.subscribe(item => {
+        if (item) {
+          const btn = document.querySelector('.cart-icon') as HTMLElement;
+          if (btn) {
+            btn.classList.add('pulse');
+            setTimeout(() => btn.classList.remove('pulse'), 600);
+          }
         }
       })
     );
@@ -84,7 +94,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.router.navigate(['/products'], {
         queryParams: { search: this.searchQuery.trim() }
       });
-      this.searchQuery = ''; // Clear after search
+      this.searchQuery = '';
     }
   }
 
@@ -106,7 +116,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.authState.logout();
+    this.authService.logout();
     this.cartService.clearCart();
     this.router.navigate(['/login']);
   }

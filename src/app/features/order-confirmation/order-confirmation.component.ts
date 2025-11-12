@@ -25,7 +25,7 @@ interface OrderResponse {
     items: OrderItem[];
     name: string;
     phoneNumber: string;
-    emailId: string | null;
+    email: string | null;
     addressLine: string;
     city: string;
     state: string;
@@ -59,7 +59,7 @@ export class OrderConfirmationComponent implements OnInit {
     if (state?.orderData?.order) {
       this.order = state.orderData.order;
       // Optional: Trigger cart refresh if needed
-      // this.cartService.loadCartCount();
+       this.cartService.loadCartCount();
     } else {
       this.router.navigate(['/cart']);
     }

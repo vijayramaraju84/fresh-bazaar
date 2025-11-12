@@ -29,7 +29,7 @@ interface Order {
   items: OrderItem[];
   name: string;
   phoneNumber: string;
-  emailId: string | null;
+  email: string | null;
   addressLine: string;
   city: string;
   state: string;
@@ -48,7 +48,7 @@ interface RawOrderItem {
   userId: string;
   name: string;
   phoneNumber: string;
-  emailId: string | null;
+  email: string | null;
   addressLine: string;
   city: string;
   state: string;
@@ -143,7 +143,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
           items: [],
           name: item.name,
           phoneNumber: item.phoneNumber,
-          emailId: item.emailId,
+          email: item.email,
           addressLine: item.addressLine,
           city: item.city,
           state: item.state,
