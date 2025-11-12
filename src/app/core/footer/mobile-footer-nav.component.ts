@@ -1,14 +1,13 @@
-// src/app/core/mobile-footer-nav/mobile-footer-nav.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
-import { RouterModule, RouterLink } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { CartService } from '../../features/cart/cart.service';
 import { AuthService, User } from '../../auth/auth.service';
-
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-mobile-footer-nav',
@@ -19,8 +18,7 @@ import { AuthService, User } from '../../auth/auth.service';
     MatBadgeModule,
     MatMenuModule,
     MatDividerModule,
-    RouterModule,
-    RouterLink
+    RouterModule
   ],
   template: `
     <div class="mobile-nav">
@@ -37,21 +35,21 @@ import { AuthService, User } from '../../auth/auth.service';
       </button>
 
       <!-- Cart -->
-      <button 
-        class="nav-item" 
-        routerLink="/cart" 
-        [matBadge]="cartCount" 
+      <button
+        class="nav-item"
+        routerLink="/cart"
+        [matBadge]="cartCount"
         matBadgeColor="accent"
         [matBadgeHidden]="cartCount === 0"
         [matBadgePosition]="'above after'"
         matBadgeSize="small">
         <mat-icon>shopping_cart</mat-icon>
-        <span>Cart</span>
+        <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
       </button>
 
       <!-- Profile / Login -->
-      <button 
-        class="nav-item" 
+      <button
+        class="nav-item"
         [matMenuTriggerFor]="profileMenu"
         routerLinkActive="active">
         <mat-icon>{{ user ? 'person' : 'login' }}</mat-icon>
@@ -59,12 +57,8 @@ import { AuthService, User } from '../../auth/auth.service';
       </button>
     </div>
 
-    <!-- SOLID GREY MENU -->
-    <mat-menu 
-      #profileMenu="matMenu" 
-      xPosition="before" 
-      panelClass="nebula-menu-panel">
-      
+    <!-- Profile Menu -->
+    <mat-menu #profileMenu="matMenu" xPosition="before" panelClass="nebula-menu-panel">
       <ng-container *ngIf="user; else loginTemplate">
         <div class="profile-section" mat-menu-item disabled>
           <div class="profile-info">
@@ -90,6 +84,7 @@ import { AuthService, User } from '../../auth/auth.service';
           <mat-icon>logout</mat-icon> Logout
         </button>
       </ng-container>
+
       <ng-template #loginTemplate>
         <button mat-menu-item routerLink="/login">
           <mat-icon>login</mat-icon> Login
@@ -100,7 +95,7 @@ import { AuthService, User } from '../../auth/auth.service';
   styles: [`
     :host { display: block; }
 
-    /* MOBILE NAV */
+    /* ───────── MOBILE NAV CONTAINER ───────── */
     .mobile-nav {
       position: fixed;
       bottom: 0;
@@ -121,114 +116,198 @@ import { AuthService, User } from '../../auth/auth.service';
       .mobile-nav { display: flex; }
     }
 
-    /* UNIFIED NAV ITEMS — equal size, centered icons & labels */
-.nav-item {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  color: #aaa;
-  font-size: 0.75rem;
-  border-radius: 18px;
-  transition: all 0.3s ease;
-  font-family: 'Roboto', sans-serif;
-  font-weight: 400;
-  z-index: 1;
-  width: 80px;             /* 👈 consistent width for all items */
-  height: 70px;            /* 👈 consistent height for all items */
-  padding: 8px 0;          /* 👈 uniform internal spacing */
-  box-sizing: border-box;  /* ensures consistent box dimensions */
-}
+    /* ───────── NAV ITEMS ───────── */
+    .nav-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 0.7rem;
+      border-radius: 14px;
+      transition: all 0.3s ease;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 400;
+      width: 70px;
+      height: 60px;
+      padding: 6px 0;
+      box-sizing: border-box;
+      overflow: visible !important;
+    }
 
-/* Make icons centered and uniform */
-.nav-item mat-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.7rem;
-  width: 32px;       /* 👈 equal icon box size */
-  height: 32px;
-  color: #00b0ff;
-  transition: all 0.3s ease;
-  text-shadow: 0 0 8px rgba(0, 176, 255, 0.5);
-}
+    .nav-item mat-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      width: 32px;
+      height: 32px;
+      color: #00b0ff;
+      transition: all 0.3s ease;
+      text-shadow: 0 0 6px rgba(0, 176, 255, 0.5);
+      overflow: visible !important;
+      position: relative;
+    }
 
-/* Label under icon */
-.nav-item span {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: #ccc;
-  letter-spacing: 0.5px;
-}
+    .nav-item span {
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: #ccc;
+      letter-spacing: 0.4px;
+    }
 
-/* Animated background glow effect */
-.nav-item::before {
-  content: '';
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(0, 176, 255, 0.25), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+      pointer-events: none;
+      border-radius: 14px;
+      z-index: 0;
+    }
+
+    .nav-item:hover::before,
+    .nav-item.active::before { transform: translateX(100%); }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: #00b0ff;
+      transform: translateY(-2px);
+    }
+
+    .nav-item:hover mat-icon,
+    .nav-item.active mat-icon {
+      color: #00b0ff;
+      text-shadow: 0 0 14px rgba(0, 176, 255, 0.9);
+      transform: scale(1.1);
+    }
+
+    .nav-item:hover span,
+    .nav-item.active span { color: #00b0ff; }
+
+    .cart-icon { position: relative; }
+.cart-badge {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(0, 176, 255, 0.25), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.5s ease;
-  pointer-events: none;
-  border-radius: 18px;
-  z-index: 0;
+  top: -6px;
+  right: -6px;
+  background: #ff5722;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  animation: pop 0.3s ease-out;
+}
+.cart-badge-inline {
+  margin-left: 8px;
+  font-weight: 600;
+  color: #ff9800;
 }
 
-.nav-item:hover::before,
-.nav-item.active::before {
-  transform: translateX(100%);
-}
-
-/* Hover + active states */
-.nav-item:hover,
-.nav-item.active {
-  color: #00b0ff;
-  transform: translateY(-3px);
-}
-
-.nav-item:hover mat-icon,
-.nav-item.active mat-icon {
-  color: #00b0ff;
-  text-shadow: 0 0 16px rgba(0, 176, 255, 0.9);
-  transform: scale(1.1);
-}
-
-.nav-item:hover span,
-.nav-item.active span {
-  color: #00b0ff;
-}
-
-
-    /* CART BADGE */
-    .mat-badge-accent {
-      --mat-badge-background-color: #ff4081;
-      --mat-badge-text-color: white;
-      --mat-badge-size: 18px;
-      font-size: 10px;
-      font-weight: bold;
+    /* ───────── ULTRA-FUTURISTIC CART BADGE ───────── */
+    .nav-item[matBadge],
+    .mat-mdc-badge {
+      overflow: visible !important;
+      position: relative !important;
+      z-index: 5 !important;
     }
 
-    .mat-badge-medium.mat-badge-above .mat-badge-content {
-      top: -6px;
-      right: -6px;
+    .mat-mdc-badge-content,
+    .mat-mdc-badge-content-inner {
+      position: absolute !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      min-width: 22px !important;
+      height: 22px !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      color: #fff !important;
+      border-radius: 50% !important;
+      right: -8px !important;
+      top: -8px !important;
+      transform: translate(50%, -50%) !important;
+      z-index: 12 !important;
+      box-sizing: border-box;
+      letter-spacing: 0.3px;
+      text-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+
+      /* Holographic shifting neon core */
+      background: conic-gradient(
+        from 180deg at 50% 50%,
+        #ff0077,
+        #ff66ff,
+        #00d9ff,
+        #ff0077
+      ) !important;
+      background-size: 200% 200% !important;
+      animation:
+        holoShift 3s linear infinite,
+        badgePulse 2s ease-in-out infinite !important;
+
+      box-shadow:
+        0 0 6px rgba(255, 0, 140, 0.9),
+        0 0 14px rgba(255, 0, 200, 0.7),
+        0 0 26px rgba(255, 64, 255, 0.6),
+        inset 0 0 8px rgba(255, 255, 255, 0.3) !important;
     }
 
-    /* PROFILE SECTION */
+    @keyframes holoShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes badgePulse {
+      0%, 100% {
+        transform: translate(50%, -50%) scale(1);
+        box-shadow:
+          0 0 6px rgba(255, 0, 140, 0.9),
+          0 0 14px rgba(255, 0, 200, 0.7),
+          0 0 26px rgba(255, 64, 255, 0.6),
+          inset 0 0 8px rgba(255, 255, 255, 0.3);
+      }
+      50% {
+        transform: translate(50%, -50%) scale(1.25);
+        box-shadow:
+          0 0 10px rgba(255, 0, 200, 1),
+          0 0 22px rgba(255, 0, 255, 0.9),
+          0 0 40px rgba(255, 64, 255, 0.8),
+          inset 0 0 12px rgba(255, 255, 255, 0.5);
+      }
+    }
+
+    .mat-badge-content {
+      all: unset !important;
+    }
+
+    @media (max-width: 400px) {
+      .nav-item { width: 65px; height: 55px; }
+      .nav-item mat-icon { font-size: 1.4rem; }
+      .mat-mdc-badge-content { right: -5px !important; top: -5px !important; }
+    }
+
+    /* ───────── PROFILE MENU ───────── */
     .profile-section {
       padding: 16px 20px;
       background: rgba(106, 27, 154, 0.15);
       border-bottom: 1px solid rgba(0, 176, 255, 0.2);
     }
 
-    .profile-info {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
+    .profile-info { display: flex; align-items: center; gap: 14px; }
 
     .profile-icon {
       color: #00b0ff;
@@ -258,20 +337,18 @@ import { AuthService, User } from '../../auth/auth.service';
       margin: 6px 0;
     }
 
-    @keyframes menuFloat {
-      from { opacity: 0; transform: translateY(-12px) scale(0.94); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    /* DARK BACKDROP */
     ::ng-deep .cdk-overlay-backdrop {
       background: rgba(10, 5, 20, 0.85) !important;
     }
   `]
 })
-export class MobileFooterNavComponent implements OnInit {
+export class MobileFooterNavComponent implements OnInit, OnDestroy {
   cartCount = 0;
   user: User | null = null;
+  cartItemCount = 0;
+
+  private userSub?: Subscription;
+  private cartSub?: Subscription;
 
   constructor(
     private cartService: CartService,
@@ -279,19 +356,17 @@ export class MobileFooterNavComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cartService.getCartCountObservable().subscribe(count => {
-      this.cartCount = count;
-    });
+    this.userSub = this.authService.user$.subscribe(user => this.user = user);
+    this.cartSub = this.cartService.getCartCountObservable().subscribe(count => this.cartCount = count);
+  }
 
-    this.user = this.authService.getCurrentUser();
-    if (this.authService.isLoggedIn() && !this.user) {
-      this.authService.getProfile().subscribe(u => this.user = u);
-    }
+  ngOnDestroy(): void {
+    this.userSub?.unsubscribe();
+    this.cartSub?.unsubscribe();
   }
 
   logout(): void {
     this.authService.logout();
     this.cartService.clearCart();
-    this.user = null;
   }
 }
