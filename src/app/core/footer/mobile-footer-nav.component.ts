@@ -22,7 +22,6 @@ import { AuthService, User } from '../../auth/auth.service';
   ],
   template: `
     <div class="mobile-nav">
-
       <!-- Home -->
       <button class="nav-item" routerLink="/home" routerLinkActive="active">
         <mat-icon>home</mat-icon>
@@ -35,7 +34,7 @@ import { AuthService, User } from '../../auth/auth.service';
         <span>Categories</span>
       </button>
 
-      <!-- Cart — SAME CLASS, NO EXTRA -->
+      <!-- Cart -->
       <button 
         class="nav-item" 
         routerLink="/cart" 
@@ -58,11 +57,12 @@ import { AuthService, User } from '../../auth/auth.service';
       </button>
     </div>
 
-    <!-- NEBULA PROFILE MENU -->
-    <mat-menu #profileMenu="matMenu" 
-              xPosition="before" 
-              class="nebula-menu" 
-              backdropClass="nebula-backdrop">
+    <!-- SOLID GREY MENU -->
+    <mat-menu 
+      #profileMenu="matMenu" 
+      xPosition="before" 
+      panelClass="nebula-menu-panel">
+      
       <ng-container *ngIf="user; else loginTemplate">
         <div class="profile-section" mat-menu-item disabled>
           <div class="profile-info">
@@ -98,7 +98,7 @@ import { AuthService, User } from '../../auth/auth.service';
   styles: [`
     :host { display: block; }
 
-    /* MOBILE NAV — NEBULA THEME */
+    /* MOBILE NAV */
     .mobile-nav {
       position: fixed;
       bottom: 0;
@@ -119,83 +119,89 @@ import { AuthService, User } from '../../auth/auth.service';
       .mobile-nav { display: flex; }
     }
 
-    /* ALL NAV ITEMS — UNIFIED STYLE */
-    .nav-item {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      background: none;
-      border: none;
-      color: #aaa;
-      font-size: 0.75rem;
-      padding: 10px 14px;
-      border-radius: 18px;
-      transition: all 0.3s ease;
-      overflow: visible;
-      font-family: 'Roboto', sans-serif;
-      font-weight: 400;
-      z-index: 1;
-    }
+    /* UNIFIED NAV ITEMS — equal size, centered icons & labels */
+.nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 0.75rem;
+  border-radius: 18px;
+  transition: all 0.3s ease;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  z-index: 1;
+  width: 80px;             /* 👈 consistent width for all items */
+  height: 70px;            /* 👈 consistent height for all items */
+  padding: 8px 0;          /* 👈 uniform internal spacing */
+  box-sizing: border-box;  /* ensures consistent box dimensions */
+}
 
-    .nav-item mat-icon {
-      font-size: 1.6rem;
-      width: 28px;
-      height: 28px;
-      color: #00b0ff;
-      transition: all 0.3s ease;
-      text-shadow: 0 0 8px rgba(0, 176, 255, 0.5);
-      position: relative;
-      z-index: 2;
-    }
+/* Make icons centered and uniform */
+.nav-item mat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  width: 32px;       /* 👈 equal icon box size */
+  height: 32px;
+  color: #00b0ff;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 8px rgba(0, 176, 255, 0.5);
+}
 
-    .nav-item span {
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: #ccc;
-      letter-spacing: 0.5px;
-      position: relative;
-      z-index: 2;
-    }
+/* Label under icon */
+.nav-item span {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #ccc;
+  letter-spacing: 0.5px;
+}
 
-    /* RIPPLE EFFECT */
-    .nav-item::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(0, 176, 255, 0.25), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.5s ease;
-      pointer-events: none;
-      border-radius: 18px;
-      z-index: 0;
-    }
+/* Animated background glow effect */
+.nav-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(0, 176, 255, 0.25), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+  pointer-events: none;
+  border-radius: 18px;
+  z-index: 0;
+}
 
-    .nav-item:hover::before,
-    .nav-item.active::before {
-      transform: translateX(100%);
-    }
+.nav-item:hover::before,
+.nav-item.active::before {
+  transform: translateX(100%);
+}
 
-    .nav-item:hover,
-    .nav-item.active {
-      color: #00b0ff;
-      transform: translateY(-3px);
-    }
+/* Hover + active states */
+.nav-item:hover,
+.nav-item.active {
+  color: #00b0ff;
+  transform: translateY(-3px);
+}
 
-    .nav-item:hover mat-icon,
-    .nav-item.active mat-icon {
-      color: #00b0ff;
-      text-shadow: 0 0 16px rgba(0, 176, 255, 0.9);
-      transform: scale(1.15);
-    }
+.nav-item:hover mat-icon,
+.nav-item.active mat-icon {
+  color: #00b0ff;
+  text-shadow: 0 0 16px rgba(0, 176, 255, 0.9);
+  transform: scale(1.1);
+}
 
-    .nav-item:hover span,
-    .nav-item.active span {
-      color: #00b0ff;
-    }
+.nav-item:hover span,
+.nav-item.active span {
+  color: #00b0ff;
+}
 
-    /* BADGE — FLOATS ABOVE */
+
+    /* CART BADGE */
     .mat-badge-accent {
       --mat-badge-background-color: #ff4081;
       --mat-badge-text-color: white;
@@ -204,34 +210,15 @@ import { AuthService, User } from '../../auth/auth.service';
       font-weight: bold;
     }
 
-    /* ENSURE BADGE DOESN'T BLOCK HOVER */
     .mat-badge-medium.mat-badge-above .mat-badge-content {
       top: -6px;
       right: -6px;
     }
 
-    /* NEBULA MENU — UNCHANGED */
-    .nebula-menu {
-      min-width: 280px !important;
-      border: 1px solid rgba(10, 23, 29, 0.4) !important;
-      border-radius: 18px !important;
-      box-shadow: 
-        0 0 30px rgba(12, 6, 15, 0.6),
-        0 0 60px rgba(0, 176, 255, 0.3),
-        inset 0 0 20px rgba(0, 176, 255, 0.1) !important;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      overflow: hidden;
-      animation: menuFloat 0.35s ease-out;
-      margin-top: 8px;
-      background: rgba(0, 0, 0, 0.43) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-    }
-
+    /* PROFILE SECTION */
     .profile-section {
       padding: 16px 20px;
-      background: linear-gradient(90deg, rgba(106, 27, 154, 0.2), rgba(0, 176, 255, 0.1));
+      background: rgba(106, 27, 154, 0.15);
       border-bottom: 1px solid rgba(0, 176, 255, 0.2);
     }
 
@@ -264,45 +251,6 @@ import { AuthService, User } from '../../auth/auth.service';
       letter-spacing: 1px;
     }
 
-    .nebula-menu .mat-mdc-menu-item {
-      color: #e0e0e0 !important;
-      font-family: 'Roboto', sans-serif !important;
-      font-size: 0.95rem !important;
-      height: 48px !important;
-      line-height: 48px !important;
-      padding: 0 24px !important;
-      transition: all 0.3s ease !important;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .nebula-menu .mat-mdc-menu-item::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(0, 176, 255, 0.2), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.5s ease;
-    }
-
-    .nebula-menu .mat-mdc-menu-item:hover::before {
-      transform: translateX(100%);
-    }
-
-    .nebula-menu .mat-mdc-menu-item:hover,
-    .nebula-menu .mat-mdc-menu-item:focus {
-      background: rgba(0, 176, 255, 0.15) !important;
-      color: #00b0ff !important;
-    }
-
-    .nebula-menu .mat-mdc-menu-item mat-icon {
-      color: #00b0ff;
-      margin-right: 14px;
-      font-size: 20px;
-      width: 24px;
-      height: 24px;
-    }
-
     .nebula-divider {
       border-top-color: rgba(0, 176, 255, 0.3) !important;
       margin: 6px 0;
@@ -312,9 +260,13 @@ import { AuthService, User } from '../../auth/auth.service';
       from { opacity: 0; transform: translateY(-12px) scale(0.94); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
+
+    /* DARK BACKDROP */
+    ::ng-deep .cdk-overlay-backdrop {
+      background: rgba(10, 5, 20, 0.85) !important;
+    }
   `]
 })
-
 export class MobileFooterNavComponent implements OnInit {
   cartCount = 0;
   user: User | null = null;

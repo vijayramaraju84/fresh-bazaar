@@ -47,6 +47,7 @@ button:hover {
   button { padding: 8px 16px; }
 }
 
+/* ───────── CART ICON ───────── */
 .cart-icon {
   position: relative;
   transition: transform 0.2s ease;
@@ -78,17 +79,27 @@ button:hover {
   font-weight: bold;
 }
 
-/* ─────── NEBULA MENU & FILTERS ─────── */
-/* .mat-menu-panel {
-  background: #1a0033 !important;
-  border: 1px solid rgba(0, 176, 255, 0.3) !important;
-  border-radius: 16px !important;
-  box-shadow: 0 0 20px rgba(106, 27, 154, 0.6), 0 0 40px rgba(0, 176, 255, 0.2) !important;
-  margin-top: 8px;
-  animation: menuFloat 0.3s ease-out;
-} */
+/* ───────── MENUS & FILTERS (SOLID COLORS) ───────── */
+.mat-menu-panel,
+:host ::ng-deep .mat-menu-panel,
+.nebula-menu-panel.mat-mdc-menu-panel,
+.cdk-overlay-container .mat-mdc-menu-panel,
+.cdk-overlay-container .nebula-menu-panel {
+  background-color: #1a1a1a !important;
+  background: #1a1a1a !important;
+  border: 1px solid #444 !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(0, 176, 255, 0.2) !important;
+  opacity: 1 !important;
+}
 
-.mat-menu-content { padding: 8px 0 !important; }
+.mat-menu-content {
+  background: #1a1a1a !important;
+  padding: 8px 0 !important;
+  opacity: 1 !important;
+}
 
 .mat-menu-item {
   color: #e0e0e0 !important;
@@ -98,42 +109,30 @@ button:hover {
   line-height: 44px !important;
   padding: 0 20px !important;
   transition: all 0.25s ease !important;
-  position: relative;
-  overflow: hidden;
-}
-
-.mat-menu-item::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(0, 176, 255, 0.1));
-  transform: translateX(-100%);
-  transition: transform 0.4s ease;
+  background: #1a1a1a !important;
 }
 
 .mat-menu-item:hover,
 .mat-menu-item:focus {
-  background: rgba(0, 176, 255, 0.15) !important;
-  color: #fff !important;
+  background: #383838 !important;
+  color: #00b0ff !important;
 }
 
+.mat-menu-item::before,
 .mat-menu-item:hover::before {
-  transform: translateX(100%);
+  display: none !important; /* remove gradients */
 }
 
 .mat-menu-item + .mat-menu-item {
-  border-top: 1px solid rgba(0, 176, 255, 0.15);
+  border-top: 1px solid #3d3d3d !important;
 }
 
-@keyframes menuFloat {
-  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
 
+/* ───────── FILTER BUTTON ───────── */
 .filter-btn {
-  background: rgba(26, 0, 51, 0.7) !important;
+  background: #1a1a1a !important;
   color: #e0e0e0 !important;
-  border: 1px solid rgba(0, 176, 255, 0.4) !important;
+  border: 1px solid #00b0ff !important;
   border-radius: 12px !important;
   text-transform: none !important;
   font-family: 'Roboto', sans-serif !important;
@@ -142,13 +141,12 @@ button:hover {
   padding: 0 16px !important;
   height: 40px !important;
   transition: all 0.3s ease !important;
-  backdrop-filter: blur(4px);
 }
 
 .filter-btn:hover {
-  background: rgba(106, 27, 154, 0.6) !important;
+  background: #3a3a3a !important;
   border-color: #00b0ff !important;
-  box-shadow: 0 0 15px rgba(0, 176, 255, 0.4) !important;
+  box-shadow: 0 0 15px #00b0ff !important;
   transform: translateY(-2px);
 }
 
@@ -159,75 +157,84 @@ button:hover {
   margin-right: 8px !important;
 }
 
-/* src/styles.css – AT THE VERY END */
-:host ::ng-deep .mat-menu-panel {
-  background: #1a0033 !important;
-  /* ... rest of styles ... */
+/* ───────── SEARCH FIELD ───────── */
+.search-field .mat-form-field-outline {
+  color: #00b0ff !important;
 }
 
-.search-field .mat-form-field-outline { color: rgba(0, 176, 255, 0.5) !important; }
-.search-field .mat-input-element { color: #e0e0e0 !important; caret-color: #00b0ff !important; }
-.search-field .mat-form-field-label { color: #aaa !important; }
-.search-field.mat-focused .mat-form-field-label { color: #00b0ff !important; }
+.search-field .mat-input-element {
+  color: #e0e0e0 !important;
+  caret-color: #00b0ff !important;
+}
 
-/* THEME-MATCHED SEARCH DIALOG */
+.search-field .mat-form-field-label {
+  color: #aaa !important;
+}
+
+.search-field.mat-focused .mat-form-field-label {
+  color: #00b0ff !important;
+}
+
+/* ───────── DIALOGS ───────── */
 .custom-search-dialog {
-
   .mat-mdc-dialog-container {
-    background: var(--dialog-bg, #1e1e1e) !important;
-    color: var(--text-primary, #ffffff) !important;
+    background: #1f1f1f !important;
+    color: #ffffff !important;
     border-radius: 16px !important;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
     padding: 0 !important;
   }
 
-
   .mat-mdc-dialog-title {
-    background: var(--dialog-header-bg, #2d2d2d) !important;
-    color: var(--text-primary, #ffffff) !important;
-    border-bottom: 1px solid var(--border-color, #444) !important;
+    background: #2a2a2a !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid #444 !important;
   }
-
 
   .mat-mdc-dialog-content {
-    background: var(--dialog-bg, #1e1e1e) !important;
-    color: var(--text-primary, #ffffff) !important;
+    background: #1f1f1f !important;
+    color: #ffffff !important;
   }
-
 
   .mat-mdc-dialog-actions {
-    background: var(--dialog-bg, #1e1e1e) !important;
-    border-top: 1px solid var(--border-color, #444) !important;
+    background: #1f1f1f !important;
+    border-top: 1px solid #444 !important;
   }
-
 
   .mat-mdc-form-field {
     --mdc-outlined-text-field-outline-color: #555 !important;
-    --mdc-outlined-text-field-hover-outline-color: var(--accent-color, #ff4081) !important;
-    --mdc-outlined-text-field-focus-outline-color: var(--accent-color, #ff4081) !important;
+    --mdc-outlined-text-field-hover-outline-color: #00b0ff !important;
+    --mdc-outlined-text-field-focus-outline-color: #00b0ff !important;
     --mdc-outlined-text-field-label-text-color: #ccc !important;
     --mdc-outlined-text-field-input-text-color: #fff !important;
   }
 
-
   .mat-mdc-input-element {
     color: #fff !important;
-    caret-color: var(--accent-color, #ff4081) !important;
+    caret-color: #00b0ff !important;
   }
-
 
   .mat-mdc-input-element::placeholder {
     color: #aaa !important;
   }
-
 
   .mat-mdc-button {
     color: #ccc !important;
   }
 
   .mat-mdc-raised-button.mat-accent {
-    background: var(--accent-color, #ff4081) !important;
+    background: #00b0ff !important;
     color: white !important;
   }
 }
 
+/* ───────── MATERIAL THEME SURFACE OVERRIDES ───────── */
+:root {
+  --mdc-theme-surface: #1a1a1a !important;
+  --mdc-theme-background: #1a1a1a !important;
+  --mat-menu-container-color: #1a1a1a !important;
+  --mat-surface: #1a1a1a !important;
+  --mat-app-background-color: #1a1a1a !important;
+  --mdc-elevated-surface-color: #1a1a1a !important;
+  --mat-mdc-menu-panel-background-color: #1a1a1a !important;
+}
