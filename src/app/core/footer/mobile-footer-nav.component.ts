@@ -5,9 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
-import { RouterModule } from '@angular/router';
+import { RouterModule, RouterLink } from '@angular/router';
 import { CartService } from '../../features/cart/cart.service';
 import { AuthService, User } from '../../auth/auth.service';
+
 
 @Component({
   selector: 'app-mobile-footer-nav',
@@ -18,7 +19,8 @@ import { AuthService, User } from '../../auth/auth.service';
     MatBadgeModule,
     MatMenuModule,
     MatDividerModule,
-    RouterModule
+    RouterModule,
+    RouterLink
   ],
   template: `
     <div class="mobile-nav">
