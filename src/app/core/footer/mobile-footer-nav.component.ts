@@ -314,7 +314,6 @@ import { AuthService, User } from '../../auth/auth.service';
     }
   `]
 })
-
 export class MobileFooterNavComponent implements OnInit {
   cartCount = 0;
   user: User | null = null;
