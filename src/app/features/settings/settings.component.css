@@ -1,0 +1,115 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d14, #1a1a22);
+  color: #e0e0e0;
+  padding: 24px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.settings-container {
+  max-width: 450px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 0 20px rgba(0, 176, 255, 0.1);
+}
+
+h2 {
+  font-family: 'Orbitron', sans-serif;
+  color: #00b0ff;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(0, 176, 255, 0.6);
+  margin-bottom: 20px;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.profile-icon {
+  font-size: 48px;
+  color: #00b0ff;
+  text-shadow: 0 0 15px rgba(0, 176, 255, 0.8);
+}
+
+h3 { margin: 0; font-size: 18px; color: #00b0ff; }
+p { margin: 0; color: #aaa; }
+
+.full-width { width: 100%; }
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.actions, .verification {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.view-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  text-align: center;
+}
+
+.login-prompt mat-icon {
+  font-size: 56px;
+  color: #00b0ff;
+  margin-bottom: 10px;
+}
+/* ───────── OTP MODAL OVERLAY ───────── */
+.otp-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000; /* high enough to overlay everything */
+}
+
+/* Dark translucent background */
+.otp-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 1;
+}
+
+/* Centered OTP component container */
+.otp-overlay-content {
+  position: relative;
+  z-index: 2;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Smooth entry animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

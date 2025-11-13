@@ -1,0 +1,44 @@
+<div class="account-container" *ngIf="user; else loginView">
+  <!-- Profile Section -->
+  <div class="profile-section">
+    <div class="profile-info">
+      <mat-icon class="profile-icon">person</mat-icon>
+      <div>
+        <div class="profile-username">{{ user.username }}</div>
+        <div class="profile-role">{{ user.role || 'Customer' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <mat-divider class="nebula-divider"></mat-divider>
+
+  <!-- Actions -->
+  <div class="account-actions">
+    <button mat-button routerLink="/orders">
+      <mat-icon>shopping_bag</mat-icon> My Orders
+    </button>
+
+    <button mat-button routerLink="/settings">
+      <mat-icon>settings</mat-icon> Settings
+    </button>
+
+    <button *ngIf="user.role === 'ADMIN'" mat-button routerLink="/admin/products/create">
+      <mat-icon>add_circle</mat-icon> Create Product
+    </button>
+
+    <mat-divider class="nebula-divider"></mat-divider>
+
+    <button mat-button (click)="logout()" color="warn">
+      <mat-icon>logout</mat-icon> Logout
+    </button>
+  </div>
+</div>
+
+<!-- Login View -->
+<ng-template #loginView>
+  <div class="login-container">
+    <button mat-raised-button color="primary" routerLink="/login">
+      <mat-icon>login</mat-icon> Login
+    </button>
+  </div>
+</ng-template>

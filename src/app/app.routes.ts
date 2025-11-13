@@ -28,6 +28,20 @@ export const routes: Routes = [
         canActivate: [ReverseAuthGuard]
       },
 
+      {
+        path: 'account',
+        loadComponent: () => import('./features/account/account.component').then(m => m.AccountComponent)
+      },
+
+      {
+        path: 'settings',
+        loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
+        canActivate: [AuthGuard]
+      },
+
+
+
+
       { path: 'orders', component: OrdersComponent, canActivate: [AuthGuard] }
     ]
   },

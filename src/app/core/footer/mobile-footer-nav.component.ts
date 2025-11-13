@@ -48,49 +48,12 @@ import { Subscription } from 'rxjs';
       </button>
 
       <!-- Profile / Login -->
-      <button
-        class="nav-item"
-        [matMenuTriggerFor]="profileMenu"
-        routerLinkActive="active">
+      <button class="nav-item" routerLink="/account" routerLinkActive="active">
         <mat-icon>{{ user ? 'person' : 'login' }}</mat-icon>
-        <span>{{ user ? 'Profile' : 'Login' }}</span>
-      </button>
+        <span>{{ user ? 'Account' : 'Login' }}</span>
+        </button>
+
     </div>
-
-    <!-- Profile Menu -->
-    <mat-menu #profileMenu="matMenu" xPosition="before" panelClass="nebula-menu-panel">
-      <ng-container *ngIf="user; else loginTemplate">
-        <div class="profile-section" mat-menu-item disabled>
-          <div class="profile-info">
-            <mat-icon class="profile-icon">person</mat-icon>
-            <div>
-              <div class="profile-username">{{ user.username }}</div>
-              <div class="profile-role">{{ user.role || 'Customer' }}</div>
-            </div>
-          </div>
-        </div>
-        <mat-divider class="nebula-divider"></mat-divider>
-        <button mat-menu-item routerLink="/orders">
-          <mat-icon>shopping_bag</mat-icon> My Orders
-        </button>
-        <button mat-menu-item routerLink="/settings">
-          <mat-icon>settings</mat-icon> Settings
-        </button>
-        <button *ngIf="user.role === 'ADMIN'" mat-menu-item routerLink="/admin/products/create">
-          <mat-icon>add_circle</mat-icon> Create Product
-        </button>
-        <mat-divider class="nebula-divider"></mat-divider>
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>logout</mat-icon> Logout
-        </button>
-      </ng-container>
-
-      <ng-template #loginTemplate>
-        <button mat-menu-item routerLink="/login">
-          <mat-icon>login</mat-icon> Login
-        </button>
-      </ng-template>
-    </mat-menu>
   `,
   styles: [`
     :host { display: block; }

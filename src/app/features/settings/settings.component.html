@@ -1,0 +1,126 @@
+<div class="settings-container" *ngIf="user; else notLoggedIn">
+  <h2>Account Settings</h2>
+
+  <div class="profile-info">
+    <mat-icon class="profile-icon">person</mat-icon>
+    <div>
+      <h3>{{ user.username }}</h3>
+      <p>{{ user.role || 'Customer' }}</p>
+    </div>
+  </div>
+
+  <mat-divider class="nebula-divider"></mat-divider>
+
+  <!-- View Mode -->
+  <div *ngIf="!editMode" class="view-mode">
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Phone:</strong> {{ user.phoneNumber || '-' }}</p>
+
+    <button mat-raised-button color="primary" (click)="enableEdit()">
+      <mat-icon>edit</mat-icon> Edit Profile
+    </button>
+  </div>
+
+  <!-- Edit Mode -->
+  <form *ngIf="editMode" class="edit-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Username</mat-label>
+      <input matInput [(ngModel)]="formData.username" name="username" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="formData.email" name="email" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Phone Number</mat-label>
+      <input matInput [(ngModel)]="formData.phoneNumber" name="phoneNumber">
+    </mat-form-field>
+
+    <!-- 🔒 New Password -->
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>New Password</mat-label>
+  <input
+    matInput
+    [type]="hidePassword ? 'password' : 'text'"
+    [(ngModel)]="formData.password"
+    name="password"
+    autocomplete="new-password"
+    (paste)="$event.preventDefault()" 
+  />
+  <button
+    mat-icon-button
+    matSuffix
+    type="button"
+    (click)="togglePasswordVisibility()"
+    [attr.aria-label]="'Show or hide password'"
+  >
+    <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+  </button>
+</mat-form-field>
+
+<!-- 🔒 Confirm Password -->
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>Confirm Password</mat-label>
+  <input
+    matInput
+    [type]="hideConfirmPassword ? 'password' : 'text'"
+    [(ngModel)]="confirmPassword"
+    name="confirmPassword"
+    autocomplete="new-password"
+    (paste)="$event.preventDefault()"
+  />
+  <button
+    mat-icon-button
+    matSuffix
+    type="button"
+    (click)="toggleConfirmPasswordVisibility()"
+    [attr.aria-label]="'Show or hide confirm password'"
+  >
+    <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+  </button>
+</mat-form-field>
+
+<!-- ⚠️ Password mismatch warning -->
+<div *ngIf="formData.password && confirmPassword && formData.password !== confirmPassword" class="password-warning">
+  <mat-icon color="warn">error_outline</mat-icon>
+  Passwords do not match.
+</div>
+
+
+    <div class="actions">
+      <button mat-raised-button color="accent" (click)="sendVerificationCode()">
+        <mat-icon>verified_user</mat-icon> Send Verification Code
+      </button>
+    </div>
+  </form>
+
+  <!-- OTP Modal -->
+  <!-- Overlay wrapper -->
+<div class="otp-overlay" *ngIf="showOtpModal">
+  <div class="otp-overlay-backdrop" (click)="showOtpModal = false"></div>
+
+  <!-- Centered OTP component -->
+  <div class="otp-overlay-content">
+    <app-otp-verification
+      [email]="user.email ?? null"
+      (verified)="onOtpVerified($event)"
+      (closed)="showOtpModal = false">
+    </app-otp-verification>
+  </div>
+</div>
+
+
+
+<!-- If not logged in -->
+<ng-template #notLoggedIn>
+  <div class="login-prompt">
+    <mat-icon>lock</mat-icon>
+    <p>You need to log in to access settings.</p>
+    <button mat-raised-button color="primary" routerLink="/login">
+      <mat-icon>login</mat-icon> Login
+    </button>
+  </div>
+</ng-template>

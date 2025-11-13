@@ -1,0 +1,25 @@
+<div class="otp-container">
+  <h3>Verify Your Email</h3>
+  <p>A verification code was sent to <strong>{{ email }}</strong>.</p>
+
+  <div class="otp-boxes" (paste)="onPaste($event)">
+    <input
+      *ngFor="let digit of otpInputs; let i = index"
+      #otpInput
+      type="text"
+      inputmode="numeric"
+      maxlength="1"
+      class="otp-box"
+      [(ngModel)]="otp[i]"
+      (input)="onInput($event, i)"
+      (keydown.backspace)="onBackspace(i)"
+    />
+  </div>
+
+  <button mat-raised-button color="primary" [disabled]="isSubmitting" (click)="verifyOtp()">
+    <mat-icon>verified</mat-icon>
+    Verify
+  </button>
+
+  <button mat-button color="warn" (click)="closeModal()">Cancel</button>
+</div>

@@ -1,0 +1,121 @@
+:host {
+  display: block;
+  padding: 24px;
+  color: #e0e0e0;
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0f12, #1b1b22);
+}
+
+/* ACCOUNT LAYOUT */
+.account-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  margin: 0 auto;
+  padding-top: 40px;
+}
+
+/* PROFILE SECTION */
+.profile-section {
+  width: 100%;
+  background: rgba(0, 176, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 15px rgba(0, 176, 255, 0.2);
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-icon {
+  font-size: 27px;
+  color: #00b0ff;
+  text-shadow: 0 0 15px rgba(0, 176, 255, 0.8);
+}
+
+.profile-username {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #00b0ff;
+  text-shadow: 0 0 6px rgba(0, 176, 255, 0.6);
+}
+
+.profile-role {
+  font-size: 13px;
+  color: #bbb;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.nebula-divider {
+  width: 100%;
+  margin: 16px 0;
+  border-top: 1px solid rgba(0, 176, 255, 0.3);
+}
+
+/* ACTION BUTTONS */
+.account-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: #e0e0e0;
+  font-size: 15px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  text-align: left;
+  width: 100%;
+}
+
+.account-actions button mat-icon {
+  margin-right: 12px;
+  color: #00b0ff;
+  text-shadow: 0 0 8px rgba(0, 176, 255, 0.8);
+}
+
+.account-actions button:hover {
+  background: rgba(0, 176, 255, 0.15);
+  transform: translateY(-2px);
+  color: #00b0ff;
+}
+
+/* LOGIN STATE */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.login-container button {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #00b0ff, #0078d7);
+  box-shadow: 0 0 12px rgba(0, 176, 255, 0.5);
+}
+
+.login-container button:hover {
+  box-shadow: 0 0 20px rgba(0, 176, 255, 0.8);
+  transform: translateY(-2px);
+}

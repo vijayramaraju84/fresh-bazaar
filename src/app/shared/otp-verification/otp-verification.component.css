@@ -1,0 +1,47 @@
+.otp-container {
+  text-align: center;
+  padding: 20px;
+  background: #1a1a2e;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 176, 255, 0.4);
+  color: #e0e0e0;
+  width: 320px;
+}
+
+.otp-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.otp-box {
+  width: 42px;
+  height: 52px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  border: 2px solid #00b0ff;
+  border-radius: 8px;
+  background: rgba(10, 10, 30, 0.9);
+  color: #fff;
+  caret-color: #00b0ff;
+  outline: none;
+  transition: all 0.25s ease-in-out;
+}
+
+.otp-box:focus {
+  border-color: #ff4081;
+  box-shadow: 0 0 15px #ff4081;
+  transform: scale(1.08);
+}
+
+button {
+  margin: 6px;
+}
+
+h3 {
+  color: #00b0ff;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 12px rgba(0, 176, 255, 0.8);
+}
