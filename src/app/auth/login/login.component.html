@@ -11,7 +11,7 @@
 
     <!-- Username -->
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Username</mat-label>
+      <mat-label>Username  or email</mat-label>
       <input
         matInput
         type="text"
@@ -22,7 +22,7 @@
         [disabled]="loading"
       />
       <mat-error *ngIf="loginForm.controls['username']?.errors?.['required']">
-        Username is required
+        Username or email is required
       </mat-error>
       <mat-error *ngIf="loginForm.controls['username']?.errors?.['minlength']">
         Minimum 3 characters

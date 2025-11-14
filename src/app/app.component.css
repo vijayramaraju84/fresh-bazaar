@@ -10,12 +10,15 @@
   color: #fff;
 }
 
-/* MAIN CONTENT - TAKES REMAINING SPACE */
 .main-content {
   flex: 1;
-  padding: 1rem;
+  padding-top: var(--header-height); /* Push content below header */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
   overflow-y: auto;
 }
+
 
 /* LOADING OVERLAY - FULL SCREEN, ON TOP */
 .ecommerce-loading-overlay {
@@ -187,4 +190,13 @@
   .loading-tip {
     font-size: 0.8rem;
   }
+}
+
+.mobile-nav {
+  pointer-events: auto; /* Only nav buttons are clickable */
+  /* your existing styles */
+}
+
+.content-with-mobile-nav {
+  padding-bottom: 70px; /* room for mobile footer */
 }

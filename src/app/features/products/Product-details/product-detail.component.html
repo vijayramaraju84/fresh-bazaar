@@ -1,88 +1,67 @@
-<div class="detail-backdrop" (click)="close.emit()">
-  <div class="detail-container" (click)="$event.stopPropagation()">
-    
-    <!-- Close Button -->
-    <button mat-icon-button class="close-btn" (click)="close.emit()" aria-label="Close">
-      <mat-icon>close</mat-icon>
-    </button>
+<div class="product-detail-page" *ngIf="product as p; else loading">
 
-    <div class="detail-grid">
+  <!-- BACK BUTTON -->
+  <button mat-icon-button class="back-btn" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
 
-      <!-- Image Section -->
-      <div class="image-section">
-        <img [src]="product.image" [alt]="product.name" class="detail-image" />
-        <div class="image-thumbs" *ngIf="product.images?.length">
-          <img *ngFor="let img of product.images" [src]="img" class="thumb" />
-        </div>
-      </div>
+  <div class="detail-grid">
 
-      <!-- Details Section -->
-      <div class="details-section">
-        <h1 class="product-title">{{ product.name }}</h1>
+    <!-- IMAGE SECTION -->
+    <div class="image-section">
+      <img [src]="p.image" class="detail-image" [alt]="p.name">
 
-        <!-- Rating -->
-        <div class="rating" *ngIf="product.rating">
-          <mat-icon *ngFor="let star of getStars(product.rating)" class="star">
-            {{ star }}
-          </mat-icon>
-          <span class="rating-count">({{ product.reviews || 0 }} reviews)</span>
-        </div>
-
-        <!-- Price -->
-        <div class="price-box">
-          <span class="price">₹{{ product.price }}</span>
-          <span class="mrp" *ngIf="product.mrp && product.mrp > product.price">
-            ₹{{ product.mrp }}
-          </span>
-          <span class="discount" *ngIf="product.mrp && product.mrp > product.price">
-            {{ getDiscountPercent(product) }}% off
-          </span>
-        </div>
-
-        <!-- Prime -->
-        <div class="prime-badge" *ngIf="product.prime">
-          <mat-icon>local_shipping</mat-icon>
-          <span>Free Delivery</span>
-        </div>
-
-        <!-- Stock -->
-        <p class="stock" [class.low]="product.stock && product.stock < 5">
-          {{ product.stock === 0 ? 'Out of Stock' : (product.stock || 0) + ' in stock' }}
-        </p>
-
-        <!-- Description -->
-        <div class="description" *ngIf="product.description">
-          <h3>Description</h3>
-          <p>{{ product.description }}</p>
-        </div>
-
-        <!-- Features -->
-        <div class="features" *ngIf="product.features?.length">
-          <h3>Key Features</h3>
-          <ul>
-            <li *ngFor="let f of product.features">{{ f }}</li>
-          </ul>
-        </div>
-
-        <!-- Actions -->
-        <div class="actions">
-          <app-add-to-cart-button
-            [product]="product"
-            buttonText="Add"
-            [disabled]="product.stock === 0"
-            (click)="$event.stopPropagation()"
-            (quantityChange)="onQuantityChange(product, $event)"
-            class="add-btn">
-          </app-add-to-cart-button>
-
-          <button mat-stroked-button class="wishlist-btn"
-                [class.active]="product.wishlisted"
-                (click)="toggleWishlist()">
-          <mat-icon>{{ product.wishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>
-          {{ product.wishlisted ? 'Wishlisted' : 'Add to Wishlist' }}
-        </button>
-        </div>
+      <div class="image-thumbs" *ngIf="p.images?.length">
+        <img *ngFor="let img of p.images" [src]="img" class="thumb">
       </div>
     </div>
+
+    <!-- DETAILS SECTION -->
+    <div class="details-section">
+
+      <h1 class="product-title">{{ p.name }}</h1>
+
+      <div class="rating" *ngIf="p.rating">
+        <mat-icon *ngFor="let s of getStars(p.rating)">
+          {{ s }}
+        </mat-icon>
+        <span class="rating-count">({{ p.reviews || 0 }} reviews)</span>
+      </div>
+
+      <div class="price-box">
+        <span class="price">₹{{ p.price }}</span>
+        <span class="mrp" *ngIf="p.mrp && p.mrp > p.price">₹{{ p.mrp }}</span>
+        <span class="discount" *ngIf="p.mrp && p.mrp > p.price">{{ getDiscountPercent(p) }}% off</span>
+      </div>
+
+      <p class="stock" [class.low]="p.stock < 5">
+        {{ p.stock === 0 ? 'Out of Stock' : p.stock + ' in stock' }}
+      </p>
+
+      <div class="description" *ngIf="p.description">
+        <h3>Description</h3>
+        <p>{{ p.description }}</p>
+      </div>
+
+      <div class="actions">
+        <app-add-to-cart-button
+          [product]="p"
+          (quantityChange)="onQuantityChange(p, $event)">
+        </app-add-to-cart-button>
+
+        <button mat-stroked-button class="wishlist-btn"
+                [class.active]="p.wishlisted"
+                (click)="toggleWishlist()">
+          <mat-icon>{{ p.wishlisted ? "favorite" : "favorite_border" }}</mat-icon>
+          {{ p.wishlisted ? "Wishlisted" : "Add to Wishlist" }}
+        </button>
+      </div>
+
+    </div>
+
   </div>
 </div>
+
+<ng-template #loading>
+  <p class="loading-text">Loading product...</p>
+</ng-template>

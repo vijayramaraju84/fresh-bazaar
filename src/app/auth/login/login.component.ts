@@ -46,6 +46,7 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.authState.logout();
     if (this.authState.isLoggedIn()) {
       const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/products';
       this.router.navigate([returnUrl]);
@@ -72,40 +73,59 @@ export class LoginComponent implements OnInit {
     if (this.isSignup) {
       // === SIGNUP ===
       if (this.password !== this.confirmPassword) {
-        this.error = 'Passwords do not match!';
+        this.error = '⚠️ Passwords do not match!';
         this.loading = false;
         return;
       }
 
       const signupData = {
-        username: this.username,
+        username: this.username.trim(),
         password: this.password,
-        email: this.email,
-        phoneNumber: this.phoneNumber,
+        email: this.email.trim(),
+        phoneNumber: this.phoneNumber.trim(),
         role: 'CUSTOMER'
       };
 
       this.authState.signup(signupData).pipe(first()).subscribe({
         next: () => {
-          this.toast('Account created! Please login.');
+          this.toast('🎉 Account created successfully! Please verify and login.');
           this.isSignup = false;
           this.resetForm();
           this.loading = false;
         },
         error: (err: HttpErrorResponse) => {
-          this.error = err.error?.message || 'Registration failed. Try again.';
+          console.error('Signup failed:', err);
+          this.error =
+            err.error?.message ||
+            err.error?.error ||
+            'Registration failed. Please try again.';
           this.loading = false;
         }
       });
     } else {
       // === LOGIN ===
-      this.authState.login(this.username, this.password).pipe(first()).subscribe({
-        next: () => {
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/products';
-          this.router.navigate([returnUrl]);
+      this.authState.login(this.username.trim(), this.password).pipe(first()).subscribe({
+        next: (res: any) => {
+          if (res?.status === 200 && res?.message?.toLowerCase().includes('successful')) {
+            const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/products';
+            this.router.navigate([returnUrl]);
+          } else {
+            this.error = res?.message || 'Unexpected login response.';
+          }
+          this.loading = false;
         },
         error: (err: HttpErrorResponse) => {
-          this.error = err.error?.error || 'Invalid username or password.';
+          console.error('Login error:', err);
+          if (err.status === 401) {
+            this.error = '❌ Incorrect username/email or password.';
+          } else if (err.status === 404) {
+            this.error = err.error?.message || '⚠️ User not found.';
+          } else {
+            this.error =
+              err.error?.message ||
+              err.error?.error ||
+              '⚠️ Unable to login. Please try again later.';
+          }
           this.loading = false;
         }
       });
@@ -117,6 +137,6 @@ export class LoginComponent implements OnInit {
   }
 
   private toast(msg: string): void {
-    alert(msg); // Replace with ToastService later
+    alert(msg); // Replace later with MatSnackBar or custom toast
   }
 }

@@ -10,11 +10,12 @@
           <h1>{{ p.name }}</h1>
           <p class="offer" *ngIf="p.offer">{{ p.offer }}</p>
           <p class="price">From ₹{{ p.price }}</p>
-          <button mat-raised-button color="accent" (click)="openDetail(p, $event)">
+          <button mat-raised-button color="accent" (click)="openDetail(p)">
             Shop Now
           </button>
         </div>
       </div>
+
       <button mat-icon-button class="nav prev" (click)="prev()" *ngIf="featuredProducts.length > 1">
         <mat-icon>chevron_left</mat-icon>
       </button>
@@ -63,7 +64,7 @@
   <div class="products-grid" #grid>
     <div *ngFor="let product of filteredProducts; trackBy: trackById"
          class="product-card" 
-         (click)="openDetail(product, $event)"
+         (click)="openDetail(product)"
          [@cardEnter]>
 
       <!-- Image + Badges -->
@@ -103,9 +104,11 @@
         <!-- Price -->
         <div class="price-row">
           <span class="current">₹{{ product.price }}</span>
+
           <span class="original" *ngIf="product.mrp && product.mrp > product.price">
             ₹{{ product.mrp }}
           </span>
+
           <span class="discount" *ngIf="product.mrp && product.mrp > product.price">
             {{ getDiscount(product) }}% off
           </span>
@@ -121,6 +124,8 @@
             (quantityChange)="onQuantityChange(product, $event)"
             class="add-btn">
           </app-add-to-cart-button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -150,12 +155,5 @@
       </div>
     </div>
   </div>
-</div>
 
-<!-- PRODUCT DETAIL MODAL -->
-<app-product-detail
-  *ngIf="selectedProduct"
-  [product]="selectedProduct"
-  (close)="closeDetail()"
-  (added)="onAdd($event)">
-</app-product-detail>
+</div>

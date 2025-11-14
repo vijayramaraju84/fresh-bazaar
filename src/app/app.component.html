@@ -3,15 +3,20 @@
   <!-- HEADER -->
   <app-header></app-header>
 
-  <!-- MAIN CONTENT -->
-  <main class="main-content">
-    <router-outlet></router-outlet>
-  </main>
+  <!-- MAIN CONTENT + MOBILE NAV -->
+  <div class="content-with-mobile-nav">
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
 
-  <!-- FOOTER -->
+    <!-- MOBILE NAV — NOW INSIDE THE FLOW -->
+    <app-mobile-footer-nav></app-mobile-footer-nav>
+  </div>
+
+  <!-- DESKTOP FOOTER (hidden on mobile) -->
   <app-footer></app-footer>
 
-  <!-- LOADING OVERLAY (Always on top) -->
+  <!-- LOADING OVERLAY -->
   <ng-container *ngIf="authLoading$ | async as loading">
     <div class="ecommerce-loading-overlay" *ngIf="loading" @fadeOut>
       <div class="loading-content">
@@ -37,6 +42,4 @@
 
   <!-- TOAST -->
   <app-toast></app-toast>
-
-  <app-mobile-footer-nav></app-mobile-footer-nav>
 </div>

@@ -1,4 +1,16 @@
-/* src/app/core/header/header.component.css */
+:host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  display: block;
+
+  /* Register height to global CSS variable */
+  --header-height: 70px; /* Adjust if your header is taller */
+}
+
+
 
 /* ROOT */
 .header {

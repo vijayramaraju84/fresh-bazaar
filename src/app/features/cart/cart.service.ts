@@ -22,7 +22,7 @@ export class CartService {
 
   private cartCountSubject = new BehaviorSubject<number>(0);
   private itemAddedSource = new BehaviorSubject<CartItem | null>(null);
-  private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
+  public cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
 
   itemAdded$ = this.itemAddedSource.asObservable();
   cartItems$ = this.cartItemsSubject.asObservable();

@@ -1,4 +1,3 @@
-// src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { LoginComponent } from './auth/login/login.component';
 import { ProductsComponent } from './features/products/products.component';
@@ -11,42 +10,61 @@ import { ReverseAuthGuard } from './auth/reverse-auth.guard';
 import { OrdersComponent } from './features/orders/orders.component';
 
 export const routes: Routes = [
-  // === PUBLIC ROUTES (no login needed) ===
+
+  // =========================
+  // 📌 PUBLIC ROUTES
+  // =========================
   {
     path: '',
     children: [
-      // Default: go to products
       { path: '', redirectTo: 'products', pathMatch: 'full' },
 
-      // Products page — PUBLIC (guest can browse)
       { path: 'products', component: ProductsComponent },
 
-      // Login page — only show if NOT logged in
       {
         path: 'login',
         component: LoginComponent,
         canActivate: [ReverseAuthGuard]
       },
 
+      // 🔥 Product details page (FULL PAGE)
       {
-        path: 'account',
-        loadComponent: () => import('./features/account/account.component').then(m => m.AccountComponent)
+        path: 'product/:id',
+        loadComponent: () =>
+          import('./features/products/Product-details/product-detail.component')
+            .then(m => m.ProductDetailComponent)
       },
 
+      // 📌 Account — requires login
       {
-        path: 'settings',
-        loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
+        path: 'account',
+        loadComponent: () =>
+          import('./features/account/account.component')
+            .then(m => m.AccountComponent),
         canActivate: [AuthGuard]
       },
 
+      // 📌 Settings — requires login
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./features/settings/settings.component')
+            .then(m => m.SettingsComponent),
+        canActivate: [AuthGuard]
+      },
 
-
-
-      { path: 'orders', component: OrdersComponent, canActivate: [AuthGuard] }
+      // 📌 Orders — requires login
+      {
+        path: 'orders',
+        component: OrdersComponent,
+        canActivate: [AuthGuard]
+      }
     ]
   },
 
-  // === PROTECTED ROUTES (require login) ===
+  // =========================
+  // 🔒 AUTH REQUIRED ROUTES
+  // =========================
   {
     path: '',
     canActivate: [AuthGuard],
@@ -58,6 +76,8 @@ export const routes: Routes = [
     ]
   },
 
-  // === 404 FALLBACK ===
+  // =========================
+  // 🚫 404 FALLBACK
+  // =========================
   { path: '**', redirectTo: '' }
 ];

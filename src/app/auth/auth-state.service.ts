@@ -1,98 +1,142 @@
 // src/app/auth/auth-state.service.ts
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
-import { tap, first } from 'rxjs/operators';
+import { Injectable, NgZone } from '@angular/core';
+import { BehaviorSubject, Observable, ReplaySubject, Subject, throwError } from 'rxjs';
+import { tap, first, catchError } from 'rxjs/operators';
 import { AuthService, User } from './auth.service';
-import { CartService } from '../features/cart/cart.service'; // ← ADD THIS
+import { CartService } from '../features/cart/cart.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthStateService {
-  private user$ = new BehaviorSubject<User | null>(null);
-  private isLoggedIn$ = new BehaviorSubject<boolean>(false);
-  private loading$ = new BehaviorSubject<boolean>(true);
-  private authReady$ = new ReplaySubject<void>(1);
+  private userSubject = new BehaviorSubject<User | null>(null);
+  private loggedInSubject = new BehaviorSubject<boolean>(false);
+  private loadingSubject = new BehaviorSubject<boolean>(true);
+  private authReadySubject = new ReplaySubject<void>(1);
+
+  // Public: emit when auth changes (login/logout/profile refresh)
+  public authStateChanged$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
-    private cartService: CartService  // ← INJECT
+    private cartService: CartService,
+    private ngZone: NgZone
   ) {
     this.initializeAuth();
   }
 
   private initializeAuth(): void {
-    this.loading$.next(true);
+    this.loadingSubject.next(true);
 
     if (this.authService.isLoggedIn()) {
       this.authService.getProfile().subscribe({
         next: (user) => {
-          this.user$.next(user);
-          this.isLoggedIn$.next(true);
-          this.loading$.next(false);
-          this.authReady$.next();
-
-          // AUTO-LOAD CART AFTER USER IS SET
+          this.updateAuthState(user, true);
           this.cartService.loadCartOnLogin();
         },
         error: () => {
           this.logout();
-          this.loading$.next(false);
-          this.authReady$.next();
+        },
+        complete: () => {
+          this.loadingSubject.next(false);
+          this.authReadySubject.next();
         }
       });
     } else {
-      this.loading$.next(false);
-      this.authReady$.next();
+      this.loadingSubject.next(false);
+      this.authReadySubject.next();
     }
   }
 
-  getAuthLoading$(): Observable<boolean> {
-    return this.loading$.asObservable();
-  }
-
+  /** Observables */
   getUser$(): Observable<User | null> {
-    return this.user$.asObservable();
+    return this.userSubject.asObservable();
   }
 
-  isLoggedIn(): boolean {
-    return this.isLoggedIn$.value;
+  getAuthLoading$(): Observable<boolean> {
+    return this.loadingSubject.asObservable();
   }
 
   waitForAuth(): Observable<void> {
-    return this.authReady$.pipe(first());
+    return this.authReadySubject.pipe(first());
   }
 
-  login(username: string, password: string): Observable<{ token: string; user: User }> {
-    this.loading$.next(true);
-    return this.authService.login(username, password).pipe(
-      tap(res => {
-        localStorage.setItem('token', res.token);
-        this.user$.next(res.user);
-        this.isLoggedIn$.next(true);
-        this.loading$.next(false);
+  isLoggedIn(): boolean {
+    return this.loggedInSubject.value;
+  }
 
-        // AUTO-LOAD CART ON LOGIN
-        this.cartService.loadCartOnLogin();
+  /** Expose current user value safely */
+  get currentUser(): User | null {
+    return this.userSubject.value;
+  }
+
+  /** Login (returns backend observable so caller can handle success/error) */
+  login(identifier: string, password: string): Observable<any> {
+    this.loadingSubject.next(true);
+
+    return this.authService.login(identifier, password).pipe(
+      tap((res) => {
+        if (res?.status === 200 && res?.token && res?.user) {
+          // persist
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('user', JSON.stringify(res.user));
+
+          // update reactive state
+          this.updateAuthState(res.user, true);
+
+          // load cart
+          this.cartService.loadCartOnLogin();
+        }
+        this.loadingSubject.next(false);
+      }),
+      catchError((err) => {
+        this.loadingSubject.next(false);
+        console.error('AuthState login error:', err);
+        return throwError(() => err);
       })
     );
   }
 
   signup(data: any): Observable<any> {
-    this.loading$.next(true);
+    this.loadingSubject.next(true);
     return this.authService.signup(data).pipe(
       tap({
-        next: () => this.loading$.next(false),
-        error: () => this.loading$.next(false)
+        next: () => this.loadingSubject.next(false),
+        error: () => this.loadingSubject.next(false)
       })
     );
   }
 
   logout(): void {
-    this.loading$.next(true);
+    this.loadingSubject.next(true);
+
+    // Clear server / local values
     this.authService.logout();
+    this.cartService.clearCart();
     localStorage.removeItem('token');
-    this.user$.next(null);
-    this.isLoggedIn$.next(false);
-    this.cartService.clearCart(); // CLEAR CART
-    setTimeout(() => this.loading$.next(false), 300);
+    localStorage.removeItem('user');
+
+    // Update reactive state inside Angular zone to ensure UI updates
+    this.ngZone.run(() => {
+      this.userSubject.next(null);
+      this.loggedInSubject.next(false);
+      this.authStateChanged$.next();
+      this.loadingSubject.next(false);
+    });
+  }
+
+  refreshUser(): void {
+    if (this.authService.isLoggedIn()) {
+      this.authService.getProfile().subscribe({
+        next: (user) => this.updateAuthState(user, true),
+        error: () => this.logout()
+      });
+    }
+  }
+
+  private updateAuthState(user: User | null, isLoggedIn: boolean): void {
+    this.ngZone.run(() => {
+      this.userSubject.next(user);
+      this.loggedInSubject.next(isLoggedIn);
+      this.authStateChanged$.next();
+    });
   }
 }

@@ -1,4 +1,4 @@
-<div class="account-container" *ngIf="user; else loginView">
+<div class="account-container" *ngIf="user">
   <!-- Profile Section -->
   <div class="profile-section">
     <div class="profile-info">
@@ -34,11 +34,8 @@
   </div>
 </div>
 
-<!-- Login View -->
-<ng-template #loginView>
-  <div class="login-container">
-    <button mat-raised-button color="primary" routerLink="/login">
-      <mat-icon>login</mat-icon> Login
-    </button>
-  </div>
-</ng-template>
+<!-- Optional Empty State (when not logged in) -->
+<div class="no-account-view" *ngIf="!user">
+  <mat-icon>account_circle</mat-icon>
+  <p>Please log in to access your account.</p>
+</div>

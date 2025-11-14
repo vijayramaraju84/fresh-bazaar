@@ -1,6 +1,6 @@
 // src/app/core/header/header.component.ts
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,9 +12,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { AuthService, User } from '../../auth/auth.service';
+import { filter } from 'rxjs/operators';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { CartService } from '../../features/cart/cart.service';
 import { SearchDialogComponent } from './search-dialog.component';
+import { User } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -39,35 +41,38 @@ export class HeaderComponent implements OnInit, OnDestroy {
   user: User | null = null;
   searchQuery = '';
   cartItemCount = 0;
+
   private subs = new Subscription();
 
   @ViewChild('mobileSearchInput', { static: false }) mobileSearchInput?: ElementRef<HTMLInputElement>;
 
   constructor(
-    private authService: AuthService,     // ← Updated
+    private authState: AuthStateService,
     private cartService: CartService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cd: ChangeDetectorRef,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
-    // USER: From AuthService (cached or fresh)
-    this.user = this.authService.getCurrentUser();
-    if (this.authService.isLoggedIn() && !this.user) {
-      this.authService.getProfile().subscribe({
-        next: (u) => this.user = u,
-        error: () => this.user = null
-      });
-    }
-
-    // CART COUNT: Works for Guest & Logged In
+    // 🔹 Listen reactively to user state (immediate updates on login/logout)
     this.subs.add(
-      this.cartService.getCartCountObservable().subscribe(count => {
-        this.cartItemCount = count;
+      this.authState.getUser$().subscribe(user => {
+        this.user = user;
+        this.cd.detectChanges(); // ensure header re-renders even if router doesn't reload
       })
     );
 
-    // PULSE ANIMATION ON ADD
+    // 🔹 Load cart count reactively
+    this.subs.add(
+      this.cartService.getCartCountObservable().subscribe(count => {
+        this.cartItemCount = count;
+        this.cd.detectChanges();
+      })
+    );
+
+    // 🔹 Optional: add pulse animation on item added
     this.subs.add(
       this.cartService.itemAdded$.subscribe(item => {
         if (item) {
@@ -79,7 +84,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    // 🔹 React to every route change — ensures state refresh when navigating to same route
+    this.subs.add(
+      this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
+        this.cd.detectChanges();
+      })
+    );
   }
+
+  ngAfterViewInit(): void {
+  const header = (this.elementRef.nativeElement as HTMLElement);
+  const height = header.offsetHeight + 'px';
+  document.documentElement.style.setProperty('--header-height', height);
+}
+
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
@@ -116,8 +135,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.authService.logout();
+    this.authState.logout();  // Use the reactive logout
     this.cartService.clearCart();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login']).then(() => this.cd.detectChanges());
   }
 }

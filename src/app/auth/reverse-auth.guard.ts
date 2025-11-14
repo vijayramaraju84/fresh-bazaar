@@ -14,13 +14,17 @@ export class ReverseAuthGuard implements CanActivate {
   ) {}
 
   canActivate(): Observable<boolean> {
-    return this.authState.waitForAuth().pipe(
-      map(() => {
-        if (this.authState.isLoggedIn()) {
+    // ✅ Directly observe reactive user stream, not just waitForAuth()
+    return this.authState.getUser$().pipe(
+      map(user => {
+        if (user) {
+          // User already logged in → redirect
           this.router.navigate(['/products']);
           return false;
+        } else {
+          // User logged out → allow access
+          return true;
         }
-        return true;
       })
     );
   }
