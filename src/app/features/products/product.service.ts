@@ -19,7 +19,7 @@ import { Product } from './product.model';
   providedIn: 'root'
 })
 export class ProductService {
-  private baseUrl = 'https://product-service-t3r2.onrender.com/products';
+  private baseUrl = 'https://product-service-7kfu.onrender.com';
 
   constructor(private http: HttpClient) {}
 

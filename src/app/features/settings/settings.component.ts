@@ -41,7 +41,7 @@ confirmPassword = '';
 
 
   private userSub?: Subscription;
-  private readonly BASE_URL = 'https://auth-service-rpa2.onrender.com/auth';
+  private readonly BASE_URL = 'https://auth-service-kw9v.onrender.com/auth';
 
   constructor(
     private authState: AuthStateService,

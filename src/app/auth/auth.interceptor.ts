@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
   const token = localStorage.getItem('token');
-  if (token && req.url.includes('https://auth-service-rpa2.onrender.com')) {
+  if (token && req.url.includes('https://auth-service-kw9v.onrender.com')) {
     const cloned = req.clone({
       headers: req.headers.set('Authorization', `Bearer ${token}`)
     });

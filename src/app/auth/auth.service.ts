@@ -15,7 +15,7 @@ export interface User {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private baseUrl = 'https://auth-service-rpa2.onrender.com/auth';
+  private baseUrl = 'https://auth-service-kw9v.onrender.com/auth';
 
   // Reactive user state
   private userSubject = new BehaviorSubject<User | null>(null);
