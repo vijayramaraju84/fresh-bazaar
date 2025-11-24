@@ -7,61 +7,94 @@
 
   <div class="detail-grid">
 
-    <!-- IMAGE SECTION -->
-    <div class="image-section">
-      <img [src]="p.image" class="detail-image" [alt]="p.name">
+    <!-- IMAGE SECTION WITH ZOOM & SWIPE -->
+    <div class="image-section" 
+         #imageContainer
+         (touchstart)="onTouchStart($event)"
+         (touchmove)="onTouchMove($event)"
+         (touchend)="onTouchEnd($event)">
 
-      <div class="image-thumbs" *ngIf="p.images?.length">
-        <img *ngFor="let img of p.images" [src]="img" class="thumb">
+      <!-- MAIN IMAGE WITH ZOOM -->
+      <div class="image-wrapper" 
+           (mousemove)="onMouseMove($event)"
+           (mouseleave)="onMouseLeave()"
+           (mouseenter)="onMouseEnter()">
+        <img [src]="p.image" 
+             class="detail-image" 
+             [alt]="p.name"
+             [class.zoom]="isZoomed"
+             [style.transform]="zoomTransform"
+             [style.transform-origin]="zoomOrigin">
       </div>
+
+<div class="image-thumbs" *ngIf="p.imagesBase64 && p.imagesBase64.length > 1">
+  <img *ngFor="let img of p.imagesBase64; let i = index"
+    [src]="img" 
+    [class.active]="i === selectedImageIndex"
+    (click)="selectImage(i)"
+    class="thumb"
+    [alt]="'Product thumbnail ' + (i + 1)">
+</div>
     </div>
 
     <!-- DETAILS SECTION -->
     <div class="details-section">
-
       <h1 class="product-title">{{ p.name }}</h1>
 
+      <!-- RATING -->
       <div class="rating" *ngIf="p.rating">
-        <mat-icon *ngFor="let s of getStars(p.rating)">
-          {{ s }}
-        </mat-icon>
+        <mat-icon *ngFor="let s of getStars(p.rating)" class="star">{{ s }}</mat-icon>
         <span class="rating-count">({{ p.reviews || 0 }} reviews)</span>
       </div>
 
+      <!-- PRICE -->
       <div class="price-box">
         <span class="price">₹{{ p.price }}</span>
         <span class="mrp" *ngIf="p.mrp && p.mrp > p.price">₹{{ p.mrp }}</span>
-        <span class="discount" *ngIf="p.mrp && p.mrp > p.price">{{ getDiscountPercent(p) }}% off</span>
+        <span class="discount" *ngIf="p.mrp && p.mrp > p.price">
+          {{ getDiscountPercent(p) }}% off
+        </span>
       </div>
 
+      <!-- STOCK -->
       <p class="stock" [class.low]="p.stock < 5">
         {{ p.stock === 0 ? 'Out of Stock' : p.stock + ' in stock' }}
       </p>
 
+      <!-- DESCRIPTION -->
       <div class="description" *ngIf="p.description">
         <h3>Description</h3>
         <p>{{ p.description }}</p>
       </div>
 
+      <!-- ACTIONS -->
       <div class="actions">
-        <app-add-to-cart-button
-          [product]="p"
-          (quantityChange)="onQuantityChange(p, $event)">
-        </app-add-to-cart-button>
+  <app-add-to-cart-button
+    [product]="p"
+    (quantityChange)="onQuantityChange(p, $event)">
+  </app-add-to-cart-button>
 
-        <button mat-stroked-button class="wishlist-btn"
-                [class.active]="p.wishlisted"
-                (click)="toggleWishlist()">
-          <mat-icon>{{ p.wishlisted ? "favorite" : "favorite_border" }}</mat-icon>
-          {{ p.wishlisted ? "Wishlisted" : "Add to Wishlist" }}
-        </button>
-      </div>
+  <button mat-stroked-button class="wishlist-btn"
+          [class.active]="p.wishlisted"
+          (click)="toggleWishlist()">
+    <mat-icon>{{ p.wishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>
+    {{ p.wishlisted ? 'Wishlisted' : 'Add to Wishlist' }}
+  </button>
 
+  <!-- SHARE BUTTON -->
+  <button mat-stroked-button class="share-btn" (click)="shareProduct()">
+    <mat-icon>share</mat-icon>
+    Share
+  </button>
+</div>
     </div>
-
   </div>
 </div>
 
+<!-- LOADING -->
 <ng-template #loading>
-  <p class="loading-text">Loading product...</p>
+  <div class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading product...</p>
+  </div>
 </ng-template>

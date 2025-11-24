@@ -4,7 +4,7 @@ export interface Product {
   price: number;
   mrp?: number;
   image: string;
-  imageBase64?: string;
+  imagesBase64?: string[];
   category?: string;
   description?: string;
   offer?: string;

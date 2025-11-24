@@ -150,3 +150,48 @@
     flex: 1;
   }
 }
+
+
+.image-thumbs {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  overflow-x: auto;
+  padding: 8px 0;
+  scrollbar-width: thin;
+}
+
+.image-thumbs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.image-thumbs::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.image-thumbs::-webkit-scrollbar-thumb {
+  background: rgba(0, 176, 255, 0.6);
+  border-radius: 3px;
+}
+
+.thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.3s ease;
+  opacity: 0.8;
+  flex-shrink: 0;
+  background: #222;
+}
+
+.thumb:hover,
+.thumb.active {
+  opacity: 1;
+  border-color: #00b0ff;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 176, 255, 0.5);
+}

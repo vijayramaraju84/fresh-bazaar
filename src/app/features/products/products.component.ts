@@ -62,7 +62,6 @@ import { Product } from './product.model';
   ]
 })
 export class ProductsComponent implements OnInit, OnDestroy, AfterViewInit {
-  
   @ViewChild('grid') grid!: ElementRef<HTMLDivElement>;
   @ViewChild('loadMore') loadMore!: ElementRef<HTMLDivElement>;
 
@@ -70,10 +69,8 @@ export class ProductsComponent implements OnInit, OnDestroy, AfterViewInit {
   filteredProducts: Product[] = [];
   featuredProducts: Product[] = [];
   categories: string[] = [];
-
   searchQuery = '';
   selectedCategory = '';
-
   sortBy: 'featured' | 'priceLow' | 'priceHigh' | 'rating' | 'newest' = 'featured';
 
   readonly sortOptions = {
@@ -84,7 +81,7 @@ export class ProductsComponent implements OnInit, OnDestroy, AfterViewInit {
     newest: 'Newest First'
   } as const;
 
-  get sortOptionKeys() {
+  get sortOptionKeys(): (keyof typeof this.sortOptions)[] {
     return Object.keys(this.sortOptions) as (keyof typeof this.sortOptions)[];
   }
 
@@ -92,11 +89,9 @@ export class ProductsComponent implements OnInit, OnDestroy, AfterViewInit {
   loading = true;
   loadingMore = false;
   hasMore = true;
-
   pageSize = 12;
   currentPage = 0;
   skeletonItems = Array(8);
-
   private subs = new Subscription();
   private autoSlide!: any;
 
@@ -109,29 +104,26 @@ export class ProductsComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-
-    // Listen to cart updates
+    // 1. SUBSCRIBE TO CART FIRST
     this.subs.add(
       this.cartService.cartItems$.subscribe(cartItems => {
-        const map = new Map(cartItems.map(i => [i.productId, i.quantity]));
-
-        this.products.forEach(p => p.cartQuantity = map.get(p.id) || 0);
-        this.featuredProducts.forEach(p => p.cartQuantity = map.get(p.id) || 0);
-
+        const cartMap = new Map(cartItems.map(i => [i.productId, i.quantity]));
+        this.products.forEach(p => p.cartQuantity = cartMap.get(p.id) || 0);
+        this.featuredProducts.forEach(p => p.cartQuantity = cartMap.get(p.id) || 0);
         this.filteredProducts = [...this.filteredProducts];
-        this.cdr.detectChanges();
+        this.cdr.detectChanges(); // FORCE UI UPDATE
       })
     );
 
-    // Load cart first
-    if (localStorage.getItem('token'))
+    // 2. LOAD CART FIRST — WAIT FOR IT
+    if (localStorage.getItem('token')) {
       await firstValueFrom(this.cartService.getCartItems());
-    else {
+    } else {
       this.cartService.loadGuestCart();
-      await new Promise(r => setTimeout(r, 0));
+      await new Promise(resolve => setTimeout(resolve, 0));
     }
 
-    // Load products
+    // 3. NOW LOAD PRODUCTS
     this.loadInitialData();
     this.setupAutoSlide();
     this.watchQueryParams();
@@ -148,50 +140,46 @@ export class ProductsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private loadInitialData(): void {
     this.loading = true;
-
     this.productService.getAllProducts().subscribe({
       next: (data) => {
         this.products = this.normalizeProducts(data || []);
         this.categories = this.getUniqueCategories();
         this.featuredProducts = this.getFeatured();
-
-        // Sync cart values
-        const cartItems = localStorage.getItem('token')
-          ? this.cartService['cartItemsSubject'].value
-          : this.cartService['guestCart'];
-
-        const map = new Map(cartItems.map((i: CartItem) => [i.productId, i.quantity]));
-
-        this.products.forEach(p => p.cartQuantity = map.get(p.id) || 0);
-        this.featuredProducts.forEach(p => p.cartQuantity = map.get(p.id) || 0);
-
         this.applyFilters();
         this.loading = false;
+
+        // FINAL FORCE UPDATE
         this.cdr.detectChanges();
       },
-      error: () => (this.loading = false)
+      error: () => this.loading = false
     });
   }
 
   private normalizeProducts(data: any[]): Product[] {
-    return data.map(p => ({
-      id: p.id || Date.now(),
-      name: p.name,
-      price: p.price || 0,
-      image: p.imageBase64
-        ? `data:image/jpeg;base64,${p.imageBase64}`
-        : 'assets/default.jpg',
-      category: p.category,
-      description: p.description,
-      stock: p.stock ?? 10,
-      rating: p.rating ?? 4.2,
-      reviews: p.reviews ?? Math.floor(Math.random() * 200),
-      prime: p.prime ?? Math.random() > 0.7,
-      mrp: p.mrp ?? Math.round((p.price || 0) * 1.3),
-      offer: p.offer,
-      wishlisted: p.wishlisted ?? false,
-      cartQuantity: 0
-    }));
+    return data.map(p => {
+      const images = Array.isArray(p.imagesBase64) ? p.imagesBase64 : [];
+      const firstImage = images.length > 0 
+        ? `data:image/jpeg;base64,${images[0]}`
+        : 'assets/default.jpg';
+
+      return {
+        id: p.id || Date.now(),
+        name: p.name || 'Unknown Product',
+        price: p.price || 0,
+        image: firstImage,
+        imagesBase64: images,
+        category: p.category,
+        description: p.description,
+        stock: p.stock ?? 10,
+        rating: p.rating ?? 4.2,
+        reviews: p.reviews ?? Math.floor(Math.random() * 200),
+        prime: p.prime ?? Math.random() > 0.7,
+        mrp: p.mrp ?? Math.round((p.price || 0) * 1.3),
+        offer: p.offer,
+        wishlisted: p.wishlisted ?? false,
+        cartQuantity: 0
+      };
+    });
   }
 
   private getUniqueCategories(): string[] {
