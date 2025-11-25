@@ -59,6 +59,10 @@ export const routes: Routes = [
     ]
   },
 
+  { path: 'about', loadComponent: () => import('./features/about/about.component').then(m => m.AboutComponent) },
+{ path: 'contact', loadComponent: () => import('./features/contactus/contact.component').then(m => m.ContactComponent) },
+{ path: 'privacy', loadComponent: () => import('./features/privacy/privacy.component').then(m => m.PrivacyComponent) },
+{ path: 'terms', loadComponent: () => import('./features/terms/terms.component').then(m => m.TermsComponent) },
   // 404 → PRODUCTS
   { path: '**', redirectTo: '/products' }
 ];
