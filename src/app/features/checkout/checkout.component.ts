@@ -57,7 +57,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   loading = false;
   private subs = new Subscription();
 
-  private apiUrl = 'https://cart-service-ftx1.onrender.com';
+  private apiUrl = 'https://cart-service-ftx1.onrender.com/cart';
 
   constructor(
     private cartService: CartService,

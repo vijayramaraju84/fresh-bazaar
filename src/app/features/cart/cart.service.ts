@@ -18,7 +18,7 @@ export interface AddToCartRequest {
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
-  private apiUrl = 'https://cart-service-ftx1.onrender.com';
+  private apiUrl = 'https://cart-service-ftx1.onrender.com/cart';
 
   private cartCountSubject = new BehaviorSubject<number>(0);
   private itemAddedSource = new BehaviorSubject<CartItem | null>(null);

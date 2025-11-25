@@ -85,7 +85,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
   filteredOrders: Order[] = [];
   private subs = new Subscription();
 
-  private apiUrl = 'https://cart-service-ftx1.onrender.com';
+  private apiUrl = 'https://cart-service-ftx1.onrender.com/cart';
 
   constructor(
     private http: HttpClient,
