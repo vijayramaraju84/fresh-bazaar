@@ -11,17 +11,23 @@ import { AuthGuard } from './auth/auth.guard';
 import { ReverseAuthGuard } from './auth/reverse-auth.guard';
 
 export const routes: Routes = [
-  // ROOT REDIRECT
-  { path: '', redirectTo: '/products', pathMatch: 'full' },
+
+  // ROOT → load products (no redirect!)
+  {
+    path: '',
+    component: ProductsComponent
+  },
 
   // PUBLIC ROUTES
   { path: 'login', component: LoginComponent, canActivate: [ReverseAuthGuard] },
 
-  // PRODUCTS LIST — /products or /product
+  // PRODUCTS LIST
   { path: 'products', component: ProductsComponent },
-  { path: 'product', redirectTo: '/products', pathMatch: 'full' }, // ← FIX: /product → products
 
-  // PRODUCT DETAIL — /product/4
+  // /product → /products
+  { path: 'product', redirectTo: '/products', pathMatch: 'full' },
+
+  // PRODUCT DETAIL — /product/:id
   {
     path: 'product/:id',
     loadComponent: () =>
@@ -29,7 +35,7 @@ export const routes: Routes = [
         .then(m => m.ProductDetailComponent)
   },
 
-  // AUTH PROTECTED ROUTES
+  // AUTH-PROTECTED ROUTES
   {
     path: '',
     canActivate: [AuthGuard],
@@ -38,12 +44,21 @@ export const routes: Routes = [
       { path: 'checkout', component: CheckoutComponent },
       { path: 'order-confirmation', component: OrderConfirmationComponent },
       { path: 'orders', component: OrdersComponent },
-      { path: 'settings', loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent) },
-      { path: 'account', loadComponent: () => import('./features/account/account.component').then(m => m.AccountComponent) },
+
+      { path: 'settings', loadComponent: () =>
+          import('./features/settings/settings.component')
+            .then(m => m.SettingsComponent)
+      },
+
+      { path: 'account', loadComponent: () =>
+          import('./features/account/account.component')
+            .then(m => m.AccountComponent)
+      },
+
       { path: 'admin/products/create', component: AdminProductCreateComponent }
     ]
   },
 
-  // 404 FALLBACK
+  // 404 → PRODUCTS
   { path: '**', redirectTo: '/products' }
 ];
