@@ -1,115 +1,263 @@
+/* src/app/features/settings/settings.component.css */
+/* FINAL – FLAWLESS DARK + LIGHT MODE SETTINGS PAGE */
+
 :host {
   display: block;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0d0d14, #1a1a22);
-  color: #e0e0e0;
-  padding: 24px;
+  background: var(--bg-solid);
+  color: var(--text-primary);
+  padding: 2rem;
   font-family: 'Roboto', sans-serif;
+  transition: background 0.6s ease, color 0.6s ease;
 }
 
+/* MAIN CARD */
 .settings-container {
-  max-width: 450px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 0 20px rgba(0, 176, 255, 0.1);
+  max-width: 520px;
+  margin: 3rem auto;
+  background: var(--surface-1);
+  border-radius: 28px;
+  padding: 3rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(12px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Light mode: clean, elevated glass */
+[data-theme="light"] .settings-container {
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+  border-color: #e0e0ec;
+  background: rgba(255,255,255,0.92);
+}
+
+/* HEADING */
 h2 {
   font-family: 'Orbitron', sans-serif;
-  color: #00b0ff;
+  font-size: 2.6rem;
+  font-weight: 700;
   text-align: center;
-  text-shadow: 0 0 8px rgba(0, 176, 255, 0.6);
-  margin-bottom: 20px;
+  margin: 0 0 2.5rem;
+  color: var(--accent-color);
+  text-shadow: 0 0 25px currentColor;
+  letter-spacing: 1.2px;
 }
 
+/* PROFILE INFO */
 .profile-info {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  background: var(--surface-2);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
 }
 
 .profile-icon {
-  font-size: 48px;
-  color: #00b0ff;
-  text-shadow: 0 0 15px rgba(0, 176, 255, 0.8);
+  font-size: 56px;
+  width: 56px;
+  height: 56px;
+  color: var(--accent-color);
+  filter: drop-shadow(0 0 20px currentColor);
 }
 
-h3 { margin: 0; font-size: 18px; color: #00b0ff; }
-p { margin: 0; color: #aaa; }
+.profile-info h3 {
+  font-size: 1.6rem;
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 600;
+}
 
-.full-width { width: 100%; }
+.profile-info p {
+  margin: 0.4rem 0 0;
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+}
+
+/* FORM & INPUTS */
+.full-width {
+  width: 100%;
+}
+
+mat-form-field {
+  width: 100%;
+}
 
 .edit-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1.8rem;
+  margin-top: 1rem;
 }
 
-.actions, .verification {
+/* VIEW MODE INFO */
+.view-mode {
+  display: grid;
+  gap: 1.2rem;
+  padding: 1.5rem;
+  background: var(--surface-2);
+  border-radius: 18px;
+  border: 1px solid var(--border-color);
+}
+
+.view-mode p {
+  margin: 0;
+  padding: 0.8rem 0;
+  border-bottom: 1px dashed var(--border-color);
+  color: var(--text-primary);
+}
+
+.view-mode p:last-child {
+  border-bottom: none;
+}
+
+.view-mode strong {
+  color: var(--accent-color);
+}
+
+/* ACTION BUTTONS */
+.actions,
+.verification {
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  gap: 1.2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
 }
 
-.view-mode {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: left;
+button[mat-raised-button],
+button[mat-stroked-button] {
+  height: 56px;
+  border-radius: 18px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 0 2rem;
+  min-width: 160px;
 }
 
+button[mat-raised-button] {
+  background: var(--accent-color) !important;
+  color: #000 !important;
+  box-shadow: 0 8px 25px rgba(255,152,0,0.4);
+}
+
+button[mat-raised-button]:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 40px rgba(255,152,0,0.5);
+}
+
+/* LOGIN PROMPT (when not logged in) */
 .login-prompt {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 80vh;
+  min-height: 80vh;
   text-align: center;
+  padding: 2rem;
 }
 
 .login-prompt mat-icon {
-  font-size: 56px;
-  color: #00b0ff;
-  margin-bottom: 10px;
+  font-size: 6rem;
+  width: 6rem;
+  height: 6rem;
+  color: var(--accent-color);
+  filter: drop-shadow(0 0 30px currentColor);
+  margin-bottom: 1.5rem;
 }
-/* ───────── OTP MODAL OVERLAY ───────── */
+
+.login-prompt h3 {
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.login-prompt p {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  max-width: 400px;
+  opacity: 0.9;
+}
+
+/* OTP MODAL OVERLAY – BEAUTIFUL IN BOTH MODES */
 .otp-overlay {
   position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000; /* high enough to overlay everything */
+  z-index: 3000;
 }
 
-/* Dark translucent background */
 .otp-overlay-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(12px);
   z-index: 1;
 }
 
-/* Centered OTP component container */
+[data-theme="light"] .otp-overlay-backdrop {
+  background: rgba(0,0,0,0.7);
+}
+
 .otp-overlay-content {
   position: relative;
   z-index: 2;
-  animation: fadeInUp 0.3s ease-out;
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--surface-1);
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  border: 1px solid var(--border-color);
 }
 
-/* Smooth entry animation */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px) scale(0.95);
+    transform: translateY(40px) scale(0.94);
   }
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+/* RESPONSIVE – FULLY FIXED & WORKING */
+@media (max-width: 600px) {
+  :host {
+    padding: 1rem;
+  }
+
+  .settings-container {
+    margin: 1.5rem auto;
+    padding: 2rem;
+    border-radius: 20px;
+  }
+
+  h2 {
+    font-size: 2.2rem;
+  }
+
+  .profile-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .actions,
+  .verification {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  button,
+  button[mat-raised-button],
+  button[mat-stroked-button] {
+    width: 100%;
   }
 }
