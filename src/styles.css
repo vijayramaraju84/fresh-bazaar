@@ -1,5 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500;600;700&display=swap');
 
+/* Animated custom properties */
 @property --gradient-angle {
   syntax: '<angle>';
   initial-value: 0deg;
@@ -17,7 +18,6 @@
 [data-theme="dark"] {
   --primary-color: #6a1b9a;
   --accent-color: #00b0ff;
-  --bg-gradient: linear-gradient(135deg, #0d001a, #1a0033, #330066);
   --bg-solid: #0f001a;
   --surface-1: #1a1a2e;
   --surface-2: #16213e;
@@ -26,8 +26,8 @@
   --text-secondary: #aaaaaa;
   --text-muted: #888888;
   --border-color: #444444;
-  --holo-shadow: 0 0 15px rgba(0, 176, 255, 0.5);
-  --holo-glow: rgba(0, 176, 255, 0.3);
+  --holo-shadow: 0 0 20px rgba(0, 176, 255, 0.5);
+  --holo-glow: rgba(0, 176, 255, 0.35);
   --cart-badge-bg: #ff4081;
 }
 
@@ -35,7 +35,6 @@
 [data-theme="light"] {
   --primary-color: #8e24aa;
   --accent-color: #0091ea;
-  --bg-gradient: linear-gradient(135deg, #e8eaf6, #c5cae9, #9fa8da);
   --bg-solid: #f5f7ff;
   --surface-1: #ffffff;
   --surface-2: #f8f9ff;
@@ -44,65 +43,131 @@
   --text-secondary: #555577;
   --text-muted: #777799;
   --border-color: #e0e0ec;
-  --holo-shadow: 0 8px 25px rgba(0, 0, 145, 234, 0.15);
+  --holo-shadow: 0 8px 30px rgba(0, 0, 145, 234, 0.15);
   --holo-glow: rgba(0, 145, 234, 0.15);
   --cart-badge-bg: #e91e63;
 }
 
-/* ============ GLOBAL APPLICATION ============ */
+/* ============ GLOBAL STYLES ============ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
   font-family: 'Roboto', sans-serif;
-  background: var(--bg-gradient);
+  background: var(--bg-solid);
   color: var(--text-primary);
   overflow-x: hidden;
   min-height: 100vh;
-  transition: background 0.4s ease;
+  transition: background 0.6s ease, color 0.6s ease;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Orbitron', sans-serif;
   margin: 0;
+  font-weight: 700;
 }
 
-/* Buttons */
-button, .mat-mdc-raised-button, .mat-mdc-unelevated-button {
-  background: linear-gradient(45deg, var(--primary-color), var(--accent-color)) !important;
-  color: white;
+/* ============ APP WRAPPER ============ */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg-solid);
+  color: var(--text-primary);
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+/* ============ BUTTONS – PERFECT IN BOTH MODES ============ */
+button,
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-outlined-button {
   border: none !important;
   border-radius: 50px !important;
+  font-weight: 600 !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+  text-transform: none !important;
+}
+
+/* DARK MODE – GRADIENT + HOLO GLOW */
+[data-theme="dark"] button,
+[data-theme="dark"] .mat-mdc-raised-button,
+[data-theme="dark"] .mat-mdc-unelevated-button {
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color)) !important;
+  color: white !important;
   box-shadow: var(--holo-shadow) !important;
-  transition: all 0.3s ease !important;
 }
 
-button:hover, .mat-mdc-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px var(--holo-glow) !important;
+[data-theme="dark"] button:hover,
+[data-theme="dark"] .mat-mdc-raised-button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 35px var(--holo-glow) !important;
 }
 
-/* ============ YOUR EXISTING STYLES (now theme-aware) ============ */
+/* LIGHT MODE – CLEAN SOLID ACCENT */
+[data-theme="light"] button,
+[data-theme="light"] .mat-mdc-raised-button,
+[data-theme="light"] .mat-mdc-unelevated-button {
+  /* background: var(--accent-color) !important; */
+  color: #000 !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+}
+
+[data-theme="light"] button:hover,
+[data-theme="light"] .mat-mdc-raised-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.22) !important;
+}
+
+/* Outlined buttons */
+.mat-mdc-outlined-button {
+  border: 2px solid var(--accent-color) !important;
+  background: transparent !important;
+  color: var(--accent-color) !important;
+}
+
+/* ============ MATERIAL COMPONENTS ============ */
 .cart-badge {
-  background: var(--cart-badge-bg);
+  background: var(--cart-badge-bg) !important;
   color: white;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
   font-weight: bold;
 }
 
-/* Menus & Overlays */
 .mat-menu-panel,
 .cdk-overlay-container .mat-mdc-menu-panel {
   background: var(--surface-1) !important;
   border: 1px solid var(--border-color) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 12px var(--holo-glow) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 20px var(--holo-glow) !important;
 }
 
 .mat-menu-item {
   color: var(--text-primary) !important;
   background: transparent !important;
+  transition: all 0.3s ease;
 }
 
 .mat-menu-item:hover {
@@ -110,15 +175,14 @@ button:hover, .mat-mdc-button:hover {
   color: var(--accent-color) !important;
 }
 
-/* Dialogs */
 .custom-search-dialog .mat-mdc-dialog-container {
   background: var(--surface-dialog) !important;
   color: var(--text-primary) !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
 }
 
 /* Form fields */
-.mat-mdc-form-field 
 .mat-mdc-form-field {
   --mdc-outlined-text-field-outline-color: var(--border-color);
   --mdc-outlined-text-field-hover-outline-color: var(--accent-color);
@@ -132,19 +196,7 @@ button:hover, .mat-mdc-button:hover {
   caret-color: var(--accent-color) !important;
 }
 
-/* App wrapper fix */
-/* App wrapper – now lets footer control its own background */
-.app-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
-  background: var(--bg-solid);   /* This was the missing key! */
-  color: var(--text-primary);
-  transition: background 0.6s ease, color 0.6s ease;
-}
-
-/* PERFECT CINEMATIC TRANSITION – FINAL VERSION YOU WILL LOVE */
+/* ============ CINEMATIC THEME TRANSITION ============ */
 .theme-transition-overlay {
   pointer-events: none;
   position: fixed;
@@ -152,71 +204,68 @@ button:hover, .mat-mdc-button:hover {
   z-index: 9999;
 }
 
-/* SUN – starts hidden below */
+/* Sun */
 .theme-transition-overlay::before {
+  content: '';
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  left: 50%;
+  bottom: -220px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffbe6 0%, #ffd700 35%, #ff9500 75%, transparent 100%);
+  box-shadow: 0 0 200px 80px #ffdd00;
+  opacity: 0;
+}
+
+/* Moon */
+.theme-transition-overlay::after {
   content: '';
   position: absolute;
   width: 360px;
   height: 360px;
   left: 50%;
-  bottom: -200px;
+  top: -200px;
   transform: translateX(-50%);
   border-radius: 50%;
-  background: radial-gradient(circle, #fffbe6 0%, #ffd700 35%, #ff9500 75%, transparent 100%);
-  box-shadow: 0 0 180px 70px #ffdd00;
+  background: radial-gradient(circle at 32% 32%, #fdfdfd 0%, #e0e7ff 40%, #94a7ff 80%, transparent 100%);
+  box-shadow: 0 0 160px 60px #8b5cf6, inset -40px -40px 70px rgba(0,0,0,0.6);
   opacity: 0;
 }
 
-/* MOON – starts hidden above */
-.theme-transition-overlay::after {
-  content: '';
-  position: absolute;
-  width: 340px;
-  height: 340px;
-  left: 50%;
-  top: -180px;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: radial-gradient(circle at 32% 32%, #fdfdfd 0%, #e0e7ff 40%, #94a78bfa 80%, transparent 100%);
-  box-shadow: 
-    0 0 140px 50px #8b5cf6,
-    inset -35px -35px 60px rgba(0,0,0,0.5);
-  opacity: 0;
-}
+/* Transitions */
+.trigger-light::after  { animation: moonFall 1.8s ease-out forwards; }
+.trigger-light::before { animation: sunRise  1.8s 0.8s ease-out forwards; }
 
-/* DARK → LIGHT: Moon falls first, then Sun rises */
-.trigger-light::after  { animation: moonFall 1.8s ease-out forwards; }        /* Moon down */
-.trigger-light::before { animation: sunRise  1.8s 0.8s ease-out forwards; }  /* Sun up after delay */
+.trigger-dark::before { animation: sunFall  1.8s ease-out forwards; }
+.trigger-dark::after  { animation: moonRise 1.8s 0.8s ease-out forwards; }
 
-/* LIGHT → DARK: Sun falls first, then Moon rises */
-.trigger-dark::before { animation: sunFall  1.8s ease-out forwards; }        /* Sun down */
-.trigger-dark::after  { animation: moonRise 1.8s 0.8s ease-out forwards; }   /* Moon up after delay */
-
-/* KEYFRAMES – Clean & Natural */
 @keyframes sunRise {
-  0%   { opacity: 0; transform: translateX(-50%) translateY(0); }
+   0%   { opacity: 0; transform: translateX(-50%) translateY(0); }
   50%  { opacity: 1; }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-130vh); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-140vh); }
 }
 
 @keyframes sunFall {
-  0%   { opacity: 1; transform: translateX(-50%) translateY(-100vh); }
-  100% { opacity: 0; transform: translateX(-50%, 120vh); }
+  0%   { opacity: 1; transform: translateX(-50%) translateY(-120vh); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(140vh); }
 }
 
 @keyframes moonRise {
   0%   { opacity: 0; transform: translateX(-50%) translateY(0); }
   50%  { opacity: 1; }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-130vh); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-140vh); }
 }
 
 @keyframes moonFall {
-  0%   { opacity: 1; transform: translateX(-50%) translateY(-100vh); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(120vh); }
+  0%   { opacity: 1; transform: translateX(-50%) translateY(-120vh); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(140vh); }
 }
-/* View Transition API ready */
+
+/* View Transition API */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0.6s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-timing-function: cubic-bezier(0.4,0,0.2,1);
 }
