@@ -57,17 +57,99 @@ import { Subscription } from 'rxjs';
     </div>
   `,
   styles: [`
-    .quantity-stepper {
-      display: flex; align-items: center; justify-content: center;
-      gap: 8px; margin-top: 8px; padding: 4px 8px;
-      background: #181818; border-radius: 20px; font-weight: 500; color: #9ad99a;
-    }
-    .count { min-width: 24px; text-align: center; font-size: 0.95rem; }
-    .add-btn { width: 100%; margin-top: 8px; }
-    .spin { animation: spin 1s linear infinite; }
-    .out-of-stock, .stock-info { text-align: center; margin-top: 4px; }
-    button[disabled] { opacity: 0.5; cursor: not-allowed; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    /* QUANTITY STEPPER – FINAL & FLAWLESS (COUNT COLOR FIXED) */
+.quantity-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: var(--surface-2);
+  border-radius: 30px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  transition: all 0.4s ease;
+  backdrop-filter: blur(8px);
+  font-size: 1rem;
+}
+
+[data-theme="dark"] .quantity-stepper:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 20px var(--holo-glow);
+  transform: translateY(-2px);
+}
+
+[data-theme="light"] .quantity-stepper:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+
+/* COUNT NUMBER – WHITE IN DARK, BLACK IN LIGHT */
+.count {
+  min-width: 32px;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-shadow: 0 0 10px #00ff8833;
+  transition: color 0.4s ease;
+}
+
+/* Light mode → black text */
+[data-theme="light"] .count {
+  color: #000000;
+  text-shadow: none;
+}
+
+/* Optional: keep a subtle green glow in both modes if you want */
+.count.glow {
+  color: #00ff88 !important;
+  text-shadow: 0 0 15px currentColor;
+}
+
+/* Plus/Minus buttons */
+.quantity-stepper button {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--surface-1);
+  color: var(--accent-color);
+  border: 2px solid var(--border-color);
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: grid;
+  place-items: center;
+  transition: all 0.3s ease;
+}
+
+.quantity-stepper button:hover:not([disabled]) {
+  background: var(--accent-color);
+  color: #000;
+  transform: scale(1.12);
+  box-shadow: 0 0 20px var(--holo-glow);
+}
+
+.quantity-stepper button[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Stock info */
+.stock-info { color: #00ff88; font-weight: 600; }
+.out-of-stock { color: #ff5252; font-weight: 600; }
+
+.add-btn {
+  width: 100%;
+  margin-top: 12px;
+  height: 56px;
+  border-radius: 20px;
+  font-size: 1.1rem;
+}
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   `]
 })
 export class AddToCartButtonComponent implements OnChanges, OnInit, OnDestroy {
