@@ -41,7 +41,7 @@
   max-width: 100%;
   height: auto;
   border-radius: 16px;
-  background: #1a1a1a;
+  /* background: #1a1a1a; */
   padding: 1rem;
   object-fit: contain;
 }
@@ -185,7 +185,7 @@
   transition: all 0.3s ease;
   opacity: 0.8;
   flex-shrink: 0;
-  background: #222;
+  /* background: #222; */
 }
 
 .thumb:hover,
@@ -194,4 +194,15 @@
   border-color: #00b0ff;
   transform: scale(1.05);
   box-shadow: 0 0 20px rgba(0, 176, 255, 0.5);
+}
+
+/* Floating gradient background animation */
+.app-wrapper, body {
+  background: linear-gradient(var(--gradient-angle), #0d001a, #1a0033, #330066);
+  animation: gradient 20s ease infinite;
+}
+
+@keyframes gradient {
+  0%, 100% { --gradient-angle: 0deg; }
+  50% { --gradient-angle: 180deg; }
 }

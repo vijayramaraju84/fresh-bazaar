@@ -1,240 +1,222 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap');
 
-:root {
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: true;
+}
+
+@property --rotate-x {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: true;
+}
+
+/* ============ DARK THEME (DEFAULT) ============ */
+:root,
+[data-theme="dark"] {
   --primary-color: #6a1b9a;
   --accent-color: #00b0ff;
   --bg-gradient: linear-gradient(135deg, #0d001a, #1a0033, #330066);
-  --text-color: #e0e0e0;
+  --bg-solid: #0f001a;
+  --surface-1: #1a1a2e;
+  --surface-2: #16213e;
+  --surface-dialog: #1f1f1f;
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --text-muted: #888888;
+  --border-color: #444444;
   --holo-shadow: 0 0 15px rgba(0, 176, 255, 0.5);
-  --orbit-animation: orbit 10s linear infinite;
+  --holo-glow: rgba(0, 176, 255, 0.3);
+  --cart-badge-bg: #ff4081;
 }
 
+/* ============ LIGHT THEME ============ */
+[data-theme="light"] {
+  --primary-color: #8e24aa;
+  --accent-color: #0091ea;
+  --bg-gradient: linear-gradient(135deg, #e8eaf6, #c5cae9, #9fa8da);
+  --bg-solid: #f5f7ff;
+  --surface-1: #ffffff;
+  --surface-2: #f8f9ff;
+  --surface-dialog: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #555577;
+  --text-muted: #777799;
+  --border-color: #e0e0ec;
+  --holo-shadow: 0 8px 25px rgba(0, 0, 145, 234, 0.15);
+  --holo-glow: rgba(0, 145, 234, 0.15);
+  --cart-badge-bg: #e91e63;
+}
+
+/* ============ GLOBAL APPLICATION ============ */
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
   background: var(--bg-gradient);
-  color: var(--text-color);
+  color: var(--text-primary);
   overflow-x: hidden;
+  min-height: 100vh;
+  transition: background 0.4s ease;
 }
 
 h1, h2, h3 {
   font-family: 'Orbitron', sans-serif;
+  margin: 0;
 }
 
-button {
-  background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
-  border: none;
+/* Buttons */
+button, .mat-mdc-raised-button, .mat-mdc-unelevated-button {
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color)) !important;
   color: white;
-  padding: 10px 20px;
-  border-radius: 50px;
-  box-shadow: var(--holo-shadow);
-  transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
+  border: none !important;
+  border-radius: 50px !important;
+  box-shadow: var(--holo-shadow) !important;
+  transition: all 0.3s ease !important;
 }
 
-button:hover {
+button:hover, .mat-mdc-button:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 25px rgba(0, 176, 255, 0.8);
+  box-shadow: 0 0 25px var(--holo-glow) !important;
 }
 
-@keyframes orbit {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@media (max-width: 768px) {
-  body { font-size: 14px; }
-  button { padding: 8px 16px; }
-}
-
-/* ───────── CART ICON ───────── */
-.cart-icon {
-  position: relative;
-  transition: transform 0.2s ease;
-}
-
-.cart-icon.pulse {
-  animation: pulse 0.6s ease-out;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-
+/* ============ YOUR EXISTING STYLES (now theme-aware) ============ */
 .cart-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #ff4081;
+  background: var(--cart-badge-bg);
   color: white;
   border-radius: 50%;
   width: 20px;
   height: 20px;
   font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-weight: bold;
 }
 
-/* ───────── MENUS & FILTERS (SOLID COLORS) ───────── */
+/* Menus & Overlays */
 .mat-menu-panel,
-:host ::ng-deep .mat-menu-panel,
-.nebula-menu-panel.mat-mdc-menu-panel,
-.cdk-overlay-container .mat-mdc-menu-panel,
-.cdk-overlay-container .nebula-menu-panel {
-  background-color: #1a1a1a !important;
-  background: #1a1a1a !important;
-  border: 1px solid #444 !important;
+.cdk-overlay-container .mat-mdc-menu-panel {
+  background: var(--surface-1) !important;
+  border: 1px solid var(--border-color) !important;
   border-radius: 12px !important;
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.8),
-    0 0 10px rgba(0, 176, 255, 0.2) !important;
-  opacity: 1 !important;
-}
-
-.mat-menu-content {
-  background: #1a1a1a !important;
-  padding: 8px 0 !important;
-  opacity: 1 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 12px var(--holo-glow) !important;
 }
 
 .mat-menu-item {
-  color: #e0e0e0 !important;
-  font-family: 'Roboto', sans-serif !important;
-  font-size: 0.95rem !important;
-  height: 44px !important;
-  line-height: 44px !important;
-  padding: 0 20px !important;
-  transition: all 0.25s ease !important;
-  background: #1a1a1a !important;
+  color: var(--text-primary) !important;
+  background: transparent !important;
 }
 
-.mat-menu-item:hover,
-.mat-menu-item:focus {
-  background: #383838 !important;
-  color: #00b0ff !important;
+.mat-menu-item:hover {
+  background: var(--surface-2) !important;
+  color: var(--accent-color) !important;
 }
 
-.mat-menu-item::before,
-.mat-menu-item:hover::before {
-  display: none !important; /* remove gradients */
+/* Dialogs */
+.custom-search-dialog .mat-mdc-dialog-container {
+  background: var(--surface-dialog) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
 }
 
-.mat-menu-item + .mat-menu-item {
-  border-top: 1px solid #3d3d3d !important;
+/* Form fields */
+.mat-mdc-form-field 
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: var(--border-color);
+  --mdc-outlined-text-field-hover-outline-color: var(--accent-color);
+  --mdc-outlined-text-field-focus-outline-color: var(--accent-color);
+  --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+  --mdc-outlined-text-field-input-text-color: var(--text-primary);
 }
 
-
-/* ───────── FILTER BUTTON ───────── */
-.filter-btn {
-  background: #1a1a1a !important;
-  color: #e0e0e0 !important;
-  border: 1px solid #00b0ff !important;
-  border-radius: 12px !important;
-  text-transform: none !important;
-  font-family: 'Roboto', sans-serif !important;
-  font-weight: 500 !important;
-  font-size: 0.95rem !important;
-  padding: 0 16px !important;
-  height: 40px !important;
-  transition: all 0.3s ease !important;
+.mat-mdc-input-element {
+  color: var(--text-primary) !important;
+  caret-color: var(--accent-color) !important;
 }
 
-.filter-btn:hover {
-  background: #3a3a3a !important;
-  border-color: #00b0ff !important;
-  box-shadow: 0 0 15px #00b0ff !important;
-  transform: translateY(-2px);
+/* App wrapper fix */
+/* App wrapper – now lets footer control its own background */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg-solid);   /* This was the missing key! */
+  color: var(--text-primary);
+  transition: background 0.6s ease, color 0.6s ease;
 }
 
-.filter-btn .mat-icon {
-  font-size: 18px !important;
-  width: 18px !important;
-  height: 18px !important;
-  margin-right: 8px !important;
+/* PERFECT CINEMATIC TRANSITION – FINAL VERSION YOU WILL LOVE */
+.theme-transition-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
 }
 
-/* ───────── SEARCH FIELD ───────── */
-.search-field .mat-form-field-outline {
-  color: #00b0ff !important;
+/* SUN – starts hidden below */
+.theme-transition-overlay::before {
+  content: '';
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  left: 50%;
+  bottom: -200px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffbe6 0%, #ffd700 35%, #ff9500 75%, transparent 100%);
+  box-shadow: 0 0 180px 70px #ffdd00;
+  opacity: 0;
 }
 
-.search-field .mat-input-element {
-  color: #e0e0e0 !important;
-  caret-color: #00b0ff !important;
+/* MOON – starts hidden above */
+.theme-transition-overlay::after {
+  content: '';
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  left: 50%;
+  top: -180px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 32%, #fdfdfd 0%, #e0e7ff 40%, #94a78bfa 80%, transparent 100%);
+  box-shadow: 
+    0 0 140px 50px #8b5cf6,
+    inset -35px -35px 60px rgba(0,0,0,0.5);
+  opacity: 0;
 }
 
-.search-field .mat-form-field-label {
-  color: #aaa !important;
+/* DARK → LIGHT: Moon falls first, then Sun rises */
+.trigger-light::after  { animation: moonFall 1.8s ease-out forwards; }        /* Moon down */
+.trigger-light::before { animation: sunRise  1.8s 0.8s ease-out forwards; }  /* Sun up after delay */
+
+/* LIGHT → DARK: Sun falls first, then Moon rises */
+.trigger-dark::before { animation: sunFall  1.8s ease-out forwards; }        /* Sun down */
+.trigger-dark::after  { animation: moonRise 1.8s 0.8s ease-out forwards; }   /* Moon up after delay */
+
+/* KEYFRAMES – Clean & Natural */
+@keyframes sunRise {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(0); }
+  50%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-130vh); }
 }
 
-.search-field.mat-focused .mat-form-field-label {
-  color: #00b0ff !important;
+@keyframes sunFall {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(-100vh); }
+  100% { opacity: 0; transform: translateX(-50%, 120vh); }
 }
 
-/* ───────── DIALOGS ───────── */
-.custom-search-dialog {
-  .mat-mdc-dialog-container {
-    background: #1f1f1f !important;
-    color: #ffffff !important;
-    border-radius: 16px !important;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
-    padding: 0 !important;
-  }
-
-  .mat-mdc-dialog-title {
-    background: #2a2a2a !important;
-    color: #ffffff !important;
-    border-bottom: 1px solid #444 !important;
-  }
-
-  .mat-mdc-dialog-content {
-    background: #1f1f1f !important;
-    color: #ffffff !important;
-  }
-
-  .mat-mdc-dialog-actions {
-    background: #1f1f1f !important;
-    border-top: 1px solid #444 !important;
-  }
-
-  .mat-mdc-form-field {
-    --mdc-outlined-text-field-outline-color: #555 !important;
-    --mdc-outlined-text-field-hover-outline-color: #00b0ff !important;
-    --mdc-outlined-text-field-focus-outline-color: #00b0ff !important;
-    --mdc-outlined-text-field-label-text-color: #ccc !important;
-    --mdc-outlined-text-field-input-text-color: #fff !important;
-  }
-
-  .mat-mdc-input-element {
-    color: #fff !important;
-    caret-color: #00b0ff !important;
-  }
-
-  .mat-mdc-input-element::placeholder {
-    color: #aaa !important;
-  }
-
-  .mat-mdc-button {
-    color: #ccc !important;
-  }
-
-  .mat-mdc-raised-button.mat-accent {
-    background: #00b0ff !important;
-    color: white !important;
-  }
+@keyframes moonRise {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(0); }
+  50%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-130vh); }
 }
 
-/* ───────── MATERIAL THEME SURFACE OVERRIDES ───────── */
-:root {
-  --mdc-theme-surface: #1a1a1a !important;
-  --mdc-theme-background: #1a1a1a !important;
-  --mat-menu-container-color: #1a1a1a !important;
-  --mat-surface: #1a1a1a !important;
-  --mat-app-background-color: #1a1a1a !important;
-  --mdc-elevated-surface-color: #1a1a1a !important;
-  --mat-mdc-menu-panel-background-color: #1a1a1a !important;
+@keyframes moonFall {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(-100vh); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(120vh); }
+}
+/* View Transition API ready */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }

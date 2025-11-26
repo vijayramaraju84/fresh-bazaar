@@ -17,6 +17,8 @@ import { AuthStateService } from '../../auth/auth-state.service';
 import { CartService } from '../../features/cart/cart.service';
 import { SearchDialogComponent } from './search-dialog.component';
 import { User } from '../../auth/auth.service';
+import { ThemeService } from '../../shared/theme/theme.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-header',
@@ -32,7 +34,8 @@ import { User } from '../../auth/auth.service';
     MatDividerModule,
     MatDialogModule,
     RouterLink,
-    CommonModule
+    CommonModule,
+    MatTooltipModule
   ],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
@@ -41,6 +44,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   user: User | null = null;
   searchQuery = '';
   cartItemCount = 0;
+
+  isDark = true;
 
   private subs = new Subscription();
 
@@ -52,8 +57,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialog: MatDialog,
     private cd: ChangeDetectorRef,
-    private elementRef: ElementRef
-  ) {}
+    private elementRef: ElementRef,
+    private themeService: ThemeService
+  ) {this.isDark = this.themeService.isDark();}
+
+  toggleTheme() {
+    this.themeService.toggle();
+    this.isDark = this.themeService.isDark();
+  }
 
   ngOnInit(): void {
     // 🔹 Listen reactively to user state (immediate updates on login/logout)

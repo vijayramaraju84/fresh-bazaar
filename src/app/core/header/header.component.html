@@ -20,6 +20,16 @@
     <mat-icon>search</mat-icon>
   </button>
 
+  <!-- Theme Toggle Button -->
+<button 
+  mat-icon-button 
+  class="icon-btn theme-toggle" 
+  (click)="toggleTheme()"
+  [matTooltip]="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+  aria-label="Toggle theme">
+  <mat-icon>{{ isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
+</button>
+
   <!-- DESKTOP: Full Search Bar -->
   <div class="search desktop-only">
     <input 

@@ -1,13 +1,15 @@
 /* src/app/app.component.css */
 
-/* APP WRAPPER - FLEX LAYOUT */
+/* This ensures app-wrapper uses the correct background variable */
 .app-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-height: 100dvh; /* Mobile support */
-  background: #0f0f0f;
-  color: #fff;
+  min-height: 100dvh;
+  background: var(--bg-solid);   /* ← THIS IS THE KEY LINE */
+  color: var(--text-primary);
+  position: relative;
+  transition: background 0.6s ease, color 0.6s ease;
 }
 
 .main-content {

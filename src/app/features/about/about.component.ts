@@ -16,7 +16,7 @@ import { MatIcon } from "@angular/material/icon";
   <div class="content">
     <div class="section">
       <h2>Our Story</h2>
-      <p>Fresh Bazaar was born from a simple idea: to bring farm-fresh vegetables and fruits directly to your doorstep. We started in 2024 with a mission to support local farmers and provide families with the freshest produce — no middlemen, no chemicals, just pure goodness.</p>
+      <p>Fresh Bazaar was born from a simple idea: to bring farm-fresh vegetables and fruits directly to your doorstep. We started in 2024 with a mission to produce the own products that what we sell, using only natural modern methods to grow the checmial free plants and provide families with the freshest produce — no middlemen, no chemicals, just pure goodness.</p>
     </div>
 
     <div class="section mission">
@@ -25,13 +25,13 @@ import { MatIcon } from "@angular/material/icon";
         <div class="card">
           <mat-icon>eco</mat-icon>
           <h3>Fresh & Organic</h3>
-          <p>100% farm-fresh, chemical-free produce</p>
+          <p>100% farm-fresh, chemical-free producets</p>
         </div>
-        <div class="card">
+        <!-- <div class="card">
           <mat-icon>support</mat-icon>
           <h3>Support Farmers</h3>
           <p>Fair prices directly to local farmers</p>
-        </div>
+        </div> -->
         <div class="card">
           <mat-icon>local_shipping</mat-icon>
           <h3>Fast Delivery</h3>

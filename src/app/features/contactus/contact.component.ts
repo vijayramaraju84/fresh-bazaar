@@ -16,7 +16,7 @@ import { MatFormField, MatLabel } from "@angular/material/input";
       <div class="info-card">
         <mat-icon>phone</mat-icon>
         <h3>Call Us</h3>
-        <p>+91 98765 43210</p>
+        <p>+91 **********</p>
         <p>Mon-Sun: 7AM - 9PM</p>
       </div>
 
@@ -30,8 +30,8 @@ import { MatFormField, MatLabel } from "@angular/material/input";
       <div class="info-card">
         <mat-icon>location_on</mat-icon>
         <h3>Visit Us</h3>
-        <p>123 Green Street</p>
-        <p>Fresh Market, Mumbai 400001</p>
+        <p></p>
+        <p>Manikonda, Hyderabad 500032</p>
       </div>
     </div>
 

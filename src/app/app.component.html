@@ -1,5 +1,5 @@
-<!-- src/app/app.component.html -->
 <div class="app-wrapper">
+
   <!-- HEADER -->
   <app-header></app-header>
 
@@ -9,11 +9,11 @@
       <router-outlet></router-outlet>
     </main>
 
-    <!-- MOBILE NAV — NOW INSIDE THE FLOW -->
+    <!-- MOBILE NAV -->
     <app-mobile-footer-nav></app-mobile-footer-nav>
   </div>
 
-  <!-- DESKTOP FOOTER (hidden on mobile) -->
+  <!-- DESKTOP FOOTER -->
   <app-footer></app-footer>
 
   <!-- LOADING OVERLAY -->
@@ -24,15 +24,18 @@
           <div class="logo-pulse"></div>
           <img src="/logo.svg" alt="Fresh Bazaar" class="brand-logo" />
         </div>
+
         <div class="progress-container">
           <div class="progress-bar">
             <div class="progress-fill"></div>
           </div>
         </div>
+
         <p class="loading-message">
           <span class="typing">Preparing your shopping experience</span>
           <span class="dots">...</span>
         </p>
+
         <p class="loading-tip">
           Did you know? 80% of users abandon slow sites in under 3 seconds!
         </p>
@@ -42,4 +45,5 @@
 
   <!-- TOAST -->
   <app-toast></app-toast>
+
 </div>
