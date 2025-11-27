@@ -1,0 +1,251 @@
+/* src/app/features/update-stock/update-stock.component.css */
+
+.stock-page {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 1rem;
+  color: var(--text-primary);
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--accent-color);
+  font-size: clamp(2.2rem, 7vw, 3rem);
+  text-shadow: 0 0 20px var(--holo-glow);
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.table-container {
+  background: var(--surface-1);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.4);
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.stock-table {
+  min-width: 680px; /* prevents squishing */
+}
+
+/* Cells */
+.product-cell {
+  min-width: 180px;
+}
+
+.product-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.product-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.low-stock {
+  color: #ff1744 !important;
+  font-weight: bold;
+}
+
+.low-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #ff5252;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.qty-input {
+  width: 90px;
+  padding: 10px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.qty-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 15px var(--holo-glow);
+}
+
+/* Action Buttons */
+.actions-cell {
+  min-width: 200px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px !important;
+  font-size: 0.9rem;
+  border-radius: 12px !important;
+}
+
+.btn-text {
+  margin-left: 6px;
+}
+
+/* Floating Save Button */
+.floating-save {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+}
+
+.save-fab {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(45deg, #00b0ff, #8e24aa) !important;
+  box-shadow: 0 8px 25px rgba(0,176,255,0.5);
+}
+
+.fab-label {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff1744;
+  color: white;
+  font-size: 0.8rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+}
+
+/* Empty State */
+.no-products {
+  text-align: center;
+  padding: 5rem 2rem;
+  color: var(--text-secondary);
+}
+
+.big-icon {
+  font-size: 80px;
+  width: 80px;
+  height: 80px;
+  color: var(--accent-color);
+  opacity: 0.2;
+  margin-bottom: 1rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .stock-page {
+    margin: 1rem auto;
+    padding: 0.5rem;
+  }
+
+  .product-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .qty-input {
+    width: 80px;
+    font-size: 1rem;
+  }
+
+  .action-btn {
+    padding: 8px !important;
+    font-size: 0.85rem;
+  }
+
+  .btn-text {
+    display: none; /* Hide text on mobile → icon only */
+  }
+
+  .save-fab {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-group {
+    flex-direction: column;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+}
+
+/* Light Mode Overrides */
+[data-theme="light"] .table-container {
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1) !important;
+  border-color: #e0e0ec !important;
+}
+
+[data-theme="light"] .qty-input {
+  background: #fff !important;
+}
+
+.search-section {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  position: relative;
+}
+
+.search-field {
+  width: 100%;
+}
+
+.search-field .mat-form-field-outline {
+  border-color: #00b0ff;
+}
+
+.results-count {
+  text-align: center;
+  margin-top: 1rem;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.no-products {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #aaa;
+}
+
+.no-products .big-icon {
+  font-size: 5rem;
+  width: 5rem;
+  height: 5rem;
+  color: #444;
+  margin-bottom: 1rem;
+}

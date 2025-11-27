@@ -26,6 +26,10 @@
       <mat-icon>add_circle</mat-icon> Create Product
     </button>
 
+    <button *ngIf="user.role === 'ADMIN'" mat-button routerLink="/update-stock">
+      <mat-icon>add_circle</mat-icon> Update Product
+    </button>
+
     <mat-divider class="nebula-divider"></mat-divider>
 
     <button mat-button (click)="logout()" color="warn">

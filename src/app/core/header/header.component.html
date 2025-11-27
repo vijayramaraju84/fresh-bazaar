@@ -1,79 +1,94 @@
 <!-- src/app/core/header/header.component.html -->
 <mat-toolbar class="header" role="toolbar">
-  <!-- LOGO (Always visible) -->
-  <span 
-    class="logo" 
-    role="button" 
-    tabindex="0" 
-    (click)="goHome()" 
-    (keyup.enter)="goHome()"
-    aria-label="Go to Fresh Bazaar home">
+  <!-- LOGO -->
+  <span class="logo" (click)="goHome()" role="button" tabindex="0" (keyup.enter)="goHome()">
     Fresh Bazaar
   </span>
 
-  <!-- MOBILE: Search Icon -->
-  <button 
-    mat-icon-button 
-    (click)="openSearchDialog()" 
-    class="icon-btn mobile-only" 
-    matTooltip="Search">
-    <mat-icon>search</mat-icon>
-  </button>
-
-  <!-- Theme Toggle Button -->
-<button 
-  mat-icon-button 
-  class="icon-btn theme-toggle" 
-  (click)="toggleTheme()"
-  [matTooltip]="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
-  aria-label="Toggle theme">
-  <mat-icon>{{ isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
-</button>
-
-  <!-- DESKTOP: Full Search Bar -->
-  <div class="search desktop-only">
-    <input 
-      matInput 
-      [(ngModel)]="searchQuery" 
-      placeholder="Search products..."
-      class="search-input" 
-      (keyup.enter)="search()" 
-      aria-label="Search products"/>
-    <button mat-icon-button class="search-btn" (click)="search()" matTooltip="Search">
+  <!-- MOBILE: Search Icon + Theme Toggle -->
+  <div class="mobile-controls mobile-only">
+    <button mat-icon-button (click)="openSearchDialog()" matTooltip="Search">
       <mat-icon>search</mat-icon>
+    </button>
+    <button mat-icon-button (click)="toggleTheme()" matTooltip="Toggle Theme">
+      <mat-icon>{{ isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
     </button>
   </div>
 
-  <!-- DESKTOP: Right Menu (Cart, Login, Categories) -->
+  <!-- DESKTOP: Full Search Bar with Autocomplete -->
+  <div class="search desktop-only" #searchContainer>
+    <div class="search-wrapper">
+      <input 
+        #desktopSearch
+        matInput 
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+        (focus)="showSuggestions = true"
+        (blur)="onSearchBlur()"
+        (keydown.enter)="performSearch()"
+        placeholder="Search products..."
+        autocomplete="off"
+        class="search-input">
+      <button mat-icon-button class="search-btn" (click)="performSearch()" matTooltip="Search">
+        <mat-icon>search</mat-icon>
+      </button>
+    </div>
+
+    <!-- AUTOCOMPLETE + HISTORY DROPDOWN -->
+    <div class="search-dropdown" *ngIf="showSuggestions && (searchSuggestions.length > 0 || recentSearches.length > 0)">
+      <!-- Suggestions -->
+      <div class="suggestion-group" *ngIf="searchSuggestions.length > 0">
+        <div class="group-title">Products</div>
+        <div 
+          class="suggestion-item"
+          *ngFor="let product of searchSuggestions; let i = index"
+          [class.highlighted]="highlightedIndex === i"
+          (mousedown)="selectProduct(product); $event.preventDefault()"
+          (mouseenter)="highlightedIndex = i">
+          <!-- <img [src]="product.image" class="suggestion-img" [alt]="product.name"> -->
+          <div class="suggestion-text">
+            <strong>{{ product.name }}</strong>
+            <small>₹{{ product.price }} • {{ product.stock }} in stock</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Searches -->
+      <div class="suggestion-group" *ngIf="recentSearches.length > 0 && !searchQuery">
+        <div class="group-title">Recent Searches</div>
+        <div 
+          class="suggestion-item history-item"
+          *ngFor="let term of recentSearches; let i = index"
+          (click)="searchFromHistory(term)">
+          <mat-icon>history</mat-icon>
+          <span>{{ term }}</span>
+          <button mat-icon-button class="clear-btn" (click)="removeSearch(term); $event.stopPropagation()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESKTOP: Right Menu -->
   <div class="user-menu desktop-only">
-    <button 
-      mat-icon-button 
-      [matMenuTriggerFor]="userMenu" 
-      class="icon-btn" 
-      matTooltip="Account">
-      <mat-icon>{{ user ? 'person' : 'login' }}</mat-icon>
+    <button mat-icon-button (click)="toggleTheme()" matTooltip="Toggle Theme">
+      <mat-icon>{{ isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
     </button>
-    <button 
-      mat-icon-button 
-      routerLink="/cart" 
-      class="cart-icon" 
-      *ngIf="user">
+    <button mat-icon-button routerLink="/categories" matTooltip="Categories">
+      <mat-icon>category</mat-icon>
+    </button>
+    <button mat-icon-button routerLink="/cart" class="cart-icon">
       <mat-icon>shopping_cart</mat-icon>
       <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
     </button>
-    <button 
-      mat-icon-button 
-      routerLink="/categories" 
-      class="icon-btn" 
-      matTooltip="Categories">
-      <mat-icon>category</mat-icon>
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" matTooltip="Account">
+      <mat-icon>{{ user ? 'person' : 'login' }}</mat-icon>
     </button>
   </div>
-
-  <!-- MOBILE: Hamburger (REMOVED — moved to footer) -->
 </mat-toolbar>
 
-<!-- USER MENU (Desktop Only) -->
+<!-- USER MENU -->
 <mat-menu #userMenu="matMenu" xPosition="before" class="user-menu-dropdown">
   <ng-container *ngIf="user; else loginTemplate">
     <div class="profile-section" mat-menu-item disabled>
@@ -90,6 +105,9 @@
     <button mat-menu-item routerLink="/settings"><mat-icon>settings</mat-icon> Settings</button>
     <button *ngIf="user.role === 'ADMIN'" mat-menu-item routerLink="/admin/products/create">
       <mat-icon>add_circle</mat-icon> Create Product
+    </button>
+    <button *ngIf="user.role === 'ADMIN'" mat-menu-item routerLink="/update-stock">
+      <mat-icon>inventory</mat-icon> Update Stock
     </button>
     <mat-divider></mat-divider>
     <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Logout</button>

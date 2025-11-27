@@ -161,5 +161,5 @@
 /* Mobile small fix */
 @media (max-width: 400px) {
   .nav-item { width: 68px; height: 60px; }
-  .nav-item mat-icon { font-size: 30px; width: 30px; height: 30px; }
+  .nav-item mat-icon { font-size: 10px; width: 30px; height: 30px; }
 }

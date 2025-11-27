@@ -59,6 +59,14 @@ export const routes: Routes = [
     ]
   },
 
+  {
+  path: 'update-stock',
+  loadComponent: () => import('./features/products/updateProduct/update-stock.component')
+    .then(m => m.UpdateStockComponent),
+  canActivate: [AuthGuard],
+  data: { roles: ['ADMIN'] }
+},
+
   { path: 'about', loadComponent: () => import('./features/about/about.component').then(m => m.AboutComponent) },
 { path: 'contact', loadComponent: () => import('./features/contactus/contact.component').then(m => m.ContactComponent) },
 { path: 'privacy', loadComponent: () => import('./features/privacy/privacy.component').then(m => m.PrivacyComponent) },

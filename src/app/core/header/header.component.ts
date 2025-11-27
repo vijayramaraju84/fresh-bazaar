@@ -1,6 +1,6 @@
 // src/app/core/header/header.component.ts
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { Router, NavigationEnd, RouterLink } from '@angular/router';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Renderer2 } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,13 +12,19 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
 import { AuthStateService } from '../../auth/auth-state.service';
 import { CartService } from '../../features/cart/cart.service';
+import { ProductService } from '../../features/products/product.service';
 import { SearchDialogComponent } from './search-dialog.component';
 import { User } from '../../auth/auth.service';
-import { ThemeService } from '../../shared/theme/theme.service';
-import { MatTooltipModule } from '@angular/material/tooltip';
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  stock: number;
+}
 
 @Component({
   selector: 'app-header',
@@ -34,8 +40,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatDividerModule,
     MatDialogModule,
     RouterLink,
-    CommonModule,
-    MatTooltipModule
+    CommonModule
   ],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
@@ -44,46 +49,49 @@ export class HeaderComponent implements OnInit, OnDestroy {
   user: User | null = null;
   searchQuery = '';
   cartItemCount = 0;
-
   isDark = true;
+
+  // Autocomplete
+  searchSuggestions: Product[] = [];
+  recentSearches: string[] = [];
+  showSuggestions = false;
+  highlightedIndex = -1;
 
   private subs = new Subscription();
 
-  @ViewChild('mobileSearchInput', { static: false }) mobileSearchInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('desktopSearch') desktopSearch!: ElementRef;
 
   constructor(
     private authState: AuthStateService,
     private cartService: CartService,
+    private productService: ProductService,
     private router: Router,
     private dialog: MatDialog,
-    private cd: ChangeDetectorRef,
-    private elementRef: ElementRef,
-    private themeService: ThemeService
-  ) {this.isDark = this.themeService.isDark();}
-
-  toggleTheme() {
-    this.themeService.toggle();
-    this.isDark = this.themeService.isDark();
+    private renderer: Renderer2
+  ) {
+    this.isDark = this.getSavedTheme();
+    this.applyTheme();
   }
 
   ngOnInit(): void {
-    // 🔹 Listen reactively to user state (immediate updates on login/logout)
+    // Load recent searches
+    this.loadRecentSearches();
+
+    // User state
     this.subs.add(
       this.authState.getUser$().subscribe(user => {
         this.user = user;
-        this.cd.detectChanges(); // ensure header re-renders even if router doesn't reload
       })
     );
 
-    // 🔹 Load cart count reactively
+    // Cart count
     this.subs.add(
       this.cartService.getCartCountObservable().subscribe(count => {
         this.cartItemCount = count;
-        this.cd.detectChanges();
       })
     );
 
-    // 🔹 Optional: add pulse animation on item added
+    // Cart pulse
     this.subs.add(
       this.cartService.itemAdded$.subscribe(item => {
         if (item) {
@@ -95,59 +103,108 @@ export class HeaderComponent implements OnInit, OnDestroy {
         }
       })
     );
-
-    // 🔹 React to every route change — ensures state refresh when navigating to same route
-    this.subs.add(
-      this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
-        this.cd.detectChanges();
-      })
-    );
   }
 
-  ngAfterViewInit(): void {
-  const header = (this.elementRef.nativeElement as HTMLElement);
-  const height = header.offsetHeight + 'px';
-  document.documentElement.style.setProperty('--header-height', height);
-}
-
-
-  ngOnDestroy(): void {
-    this.subs.unsubscribe();
+  // THEME
+  private getSavedTheme(): boolean {
+    return localStorage.getItem('theme') !== 'light';
   }
 
+  toggleTheme(): void {
+    this.isDark = !this.isDark;
+    this.applyTheme();
+    localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+  }
+
+  private applyTheme(): void {
+    if (this.isDark) {
+      this.renderer.removeAttribute(document.body, 'data-theme');
+    } else {
+      this.renderer.setAttribute(document.body, 'data-theme', 'light');
+    }
+  }
+
+  // SEARCH AUTOCOMPLETE
+  onSearchInput(): void {
+    const query = this.searchQuery.trim().toLowerCase();
+    if (!query) {
+      this.searchSuggestions = [];
+      this.showSuggestions = this.recentSearches.length > 0;
+      return;
+    }
+
+    this.productService.getAllProducts().subscribe(products => {
+      this.searchSuggestions = products
+        .filter(p => p.name.toLowerCase().includes(query))
+        .slice(0, 6); // Limit to 6 suggestions
+      this.showSuggestions = true;
+    });
+  }
+
+  selectProduct(product: Product): void {
+    this.searchQuery = product.name;
+    this.showSuggestions = false;
+    this.addToRecentSearches(product.name);
+    this.router.navigate(['/product', product.id]);
+  }
+
+  performSearch(): void {
+    if (this.searchQuery.trim()) {
+      this.addToRecentSearches(this.searchQuery.trim());
+      this.router.navigate(['/products'], {
+        queryParams: { search: this.searchQuery.trim() }
+      });
+      this.showSuggestions = false;
+    }
+  }
+
+  searchFromHistory(term: string): void {
+    this.searchQuery = term;
+    this.showSuggestions = false;
+    this.performSearch();
+  }
+
+  removeSearch(term: string): void {
+    this.recentSearches = this.recentSearches.filter(t => t !== term);
+    localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
+  }
+
+  private addToRecentSearches(term: string): void {
+    let searches = this.recentSearches.filter(t => t !== term);
+    searches.unshift(term);
+    this.recentSearches = searches.slice(0, 5);
+    localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
+  }
+
+  private loadRecentSearches(): void {
+    const saved = localStorage.getItem('recentSearches');
+    this.recentSearches = saved ? JSON.parse(saved) : [];
+  }
+
+  onSearchBlur(): void {
+    setTimeout(() => this.showSuggestions = false, 200);
+  }
+
+  // NAV
   goHome(): void {
     this.router.navigate(['/products']);
   }
 
-  search(): void {
-    if (this.searchQuery.trim()) {
-      this.router.navigate(['/products'], {
-        queryParams: { search: this.searchQuery.trim() }
-      });
-      this.searchQuery = '';
-    }
-  }
-
   openSearchDialog(): void {
-    const dialogRef = this.dialog.open(SearchDialogComponent, {
+    this.dialog.open(SearchDialogComponent, {
       width: '90vw',
       maxWidth: '400px',
-      panelClass: 'search-dialog',
-      data: { query: this.searchQuery },
-      autoFocus: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result?.trim()) {
-        this.searchQuery = result;
-        this.search();
-      }
+      data: { query: this.searchQuery }
     });
   }
 
   logout(): void {
-    this.authState.logout();  // Use the reactive logout
+    this.authState.logout();
     this.cartService.clearCart();
-    this.router.navigate(['/login']).then(() => this.cd.detectChanges());
+    this.router.navigate(['/login']);
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 }

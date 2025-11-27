@@ -1,0 +1,113 @@
+<!-- src/app/features/update-stock/update-stock.component.html -->
+<div class="stock-page">
+  <h1 class="title">Update Stock</h1>
+  <p class="subtitle">Adjust inventory with + or -</p>
+
+  <!-- SEARCH WITH AUTOCOMPLETE -->
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-field" (click)="focusInput()">
+      <mat-label>Search Products</mat-label>
+      <input 
+        #searchInput
+        matInput 
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+        (focus)="showSuggestions = true"
+        (blur)="onBlur()"
+        placeholder="Type product name..."
+        autocomplete="off">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <!-- AUTOCOMPLETE DROPDOWN -->
+    <div class="autocomplete-dropdown" 
+         *ngIf="showSuggestions && filteredProducts.length > 0 && searchQuery">
+      <div 
+        class="suggestion-item"
+        *ngFor="let product of filteredProducts; let i = index"
+        [class.highlighted]="i === highlightedIndex"
+        (mousedown)="selectSuggestion(product); $event.preventDefault()"
+        (mouseenter)="highlightedIndex = i">
+        <!-- <img [src]="product.image" class="suggestion-img" [alt]="product.name"> -->
+        <div class="suggestion-text">
+          <strong [innerHTML]="highlightMatch(product.name, searchQuery)"></strong>
+          <small>{{ product.currentStock }} in stock</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-count" *ngIf="searchQuery">
+      Found {{ filteredProducts.length }} product{{ filteredProducts.length !== 1 ? 's' : '' }}
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-container" *ngIf="filteredProducts.length > 0; else emptyState">
+    <table mat-table [dataSource]="filteredProducts" class="stock-table">
+      <!-- ... your columns (same as before) ... -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Product </th>
+        <td mat-cell *matCellDef="let p" class="product-cell">
+          <div class="product-info">
+            <img [src]="p.image" alt="{{p.name}}" class="product-img" onerror="this.src='assets/default.jpg'">
+            <span class="product-name">{{ p.name }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Current Stock -->
+      <ng-container matColumnDef="currentStock">
+        <th mat-header-cell *matHeaderCellDef> Current </th>
+        <td mat-cell *matCellDef="let p">
+          <strong [class.low-stock]="p.currentStock < 10">
+            {{ p.currentStock }}
+          </strong>
+        </td>
+      </ng-container>
+
+      <!-- Quantity -->
+      <ng-container matColumnDef="quantity">
+        <th mat-header-cell *matHeaderCellDef> Amount </th>
+        <td mat-cell *matCellDef="let p">
+          <input type="number" [(ngModel)]="p.quantity" min="1" class="qty-input" placeholder="Qty">
+        </td>
+      </ng-container>
+
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Action </th>
+        <td mat-cell *matCellDef="let p" class="actions-cell">
+          <div class="btn-group">
+            <button mat-raised-button color="primary" (click)="incrementStock(p)"
+                    [disabled]="!p.quantity || p.quantity <= 0">
+              <mat-icon>add</mat-icon> Add
+            </button>
+            <button mat-stroked-button color="warn" (click)="decrementStock(p)"
+                    [disabled]="!p.quantity || p.quantity <= 0 || p.quantity > p.currentStock">
+              <mat-icon>remove</mat-icon> Remove
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="no-products">
+      <mat-icon class="big-icon">search_off</mat-icon>
+      <h3>No products found</h3>
+      <p *ngIf="searchQuery">Try a different search term</p>
+    </div>
+  </ng-template>
+
+  <!-- SAVE ALL -->
+  <div class="floating-save" *ngIf="hasPendingUpdates()">
+    <button mat-fab color="accent" (click)="saveAll()" [disabled]="saving">
+      <mat-icon>save_alt</mat-icon>
+      <span class="fab-label">{{ getPendingUpdates().length }}</span>
+    </button>
+  </div>
+</div>
